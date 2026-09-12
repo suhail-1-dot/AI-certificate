@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SECURITY CONSOLE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #0a0c0a;
+            color: #b0e0b0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .terminal {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 25px 30px;
+            background: #0e120e;
+            border: 1px solid #2a4a2a;
+            box-shadow: 0 0 15px rgba(50, 180, 50, 0.2);
+            min-height: 90vh;
+            border-radius: 6px;
+            transition: box-shadow 0.3s;
+        }
+
+        .header {
+            color: #8fbc8f;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #2e4a2e;
+            padding-bottom: 15px;
+            text-transform: uppercase;
+            text-shadow: 0 0 6px #2a5a2a;
+        }
+
+        .line {
+            margin: 6px 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .white {
+            color: #d4e8d4;
+        }
+
+        .dim {
+            color: #8aa88a;
+        }
+
+        .yellow {
+            color: #c9b86a;
+        }
+
+        .red {
+            color: #c96a6a;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 16px;
+            border: 1px solid #3a5a3a;
+            margin: 10px 0 14px 0;
+            background: #121812;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #4a7a4a;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 8px #4a9a4a;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: #7aaa7a;
+            margin-left: 4px;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .mono-badge {
+            display: inline-block;
+            background: #1a2a1a;
+            padding: 0 6px;
+            border-radius: 3px;
+            color: #8fbc8f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="terminal">
+    <div class="header">[ SECURITY CONSOLE ]</div>
+    <div id="terminal"></div>
+</div>
+
+<script>
+    const terminal = document.getElementById("terminal");
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function addLine(text, className = "line") {
+        const line = document.createElement("div");
+        line.className = className;
+        line.innerHTML = text;
+        terminal.appendChild(line);
+        window.scrollTo(0, document.body.scrollHeight);
+        return line;
+    }
+
+    async function typeLine(text, className = "line") {
+        const line = document.createElement("div");
+        line.className = className;
+        terminal.appendChild(line);
+
+        for (let i = 0; i < text.length; i++) {
+            line.innerHTML += text[i];
+            await sleep(15 + Math.random() * 30);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+        return line;
+    }
+
+    async function progressTask(name, duration) {
+        addLine("> " + name, "dim");
+
+        const container = document.createElement("div");
+        container.className = "progress-container";
+        const bar = document.createElement("div");
+        bar.className = "progress-bar";
+        container.appendChild(bar);
+        terminal.appendChild(container);
+
+        let progress = 0;
+        while (progress < 100) {
+            progress += Math.floor(Math.random() * 8) + 2;
+            if (progress > 100) progress = 100;
+            bar.style.width = progress + "%";
+            await sleep(duration / 18);
+        }
+        // subtle completion line without bright color
+        addLine("  █ complete", "dim");
+    }
+
+    async function fakeFileCopy() {
+        addLine("", "line");
+        addLine("> reading system objects ...", "dim");
+        await sleep(500);
+
+        const files = [
+            "net_config.dat",
+            "dev_cache.tmp",
+            "sec_index.db",
+            "sess_data.bin",
+            "sys_logs.dat",
+            "net_map.cache"
+        ];
+
+        for (let file of files) {
+            let percent = 0;
+            const line = document.createElement("div");
+            line.className = "line dim";
+            terminal.appendChild(line);
+
+            while (percent < 100) {
+                percent += Math.floor(Math.random() * 14) + 6;
+                if (percent > 100) percent = 100;
+                line.innerHTML = `> processing ${file} [${percent}%]`;
+                await sleep(70);
+            }
+            line.innerHTML = `> ${file} [ok]`;
+            await sleep(60);
+        }
+    }
+
+    async function main() {
+        await sleep(400);
+
+        await typeLine("> init security console v2.17", "dim");
+        await sleep(400);
+
+        await typeLine("> loading network modules ...", "dim");
+        await sleep(500);
+
+        await typeLine("> network interface detected", "dim");
+        await sleep(400);
+        addLine("[+] if: eth0 | Dialog 4G | link up", "white");
+
+        await sleep(500);
+        await typeLine("> probing active devices ...", "dim");
+        await sleep(600);
+        addLine("[+] device: 00:1A:2B:3C:4D:5E", "yellow");
+
+        await sleep(400);
+        await typeLine("> identifying network parameters ...", "dim");
+        await progressTask("scanning subnet", 1600);
+        await sleep(400);
+
+        await typeLine("> checking authentication services ...", "dim");
+        await progressTask("analyzing security config", 2000);
+        await sleep(400);
+
+        await typeLine("> device identification ...", "dim");
+        await sleep(500);
+        addLine("[!] mac vendor lookup: unknown", "yellow");
+        await sleep(400);
+
+        await fakeFileCopy();
+        await sleep(600);
+
+        addLine("", "line");
+        addLine("[!] unusual network activity", "red");
+        await sleep(800);
+
+        await typeLine("> running secondary analysis ...", "dim");
+        await progressTask("deep packet inspection", 2200);
+        await sleep(600);
+
+        addLine("", "line");
+        addLine("----------------------------------------", "dim");
+        addLine("SECURITY EVENT DETECTED", "red");
+        addLine("----------------------------------------", "dim");
+        await sleep(900);
+
+        await typeLine("> classifying connection ...", "dim");
+        await sleep(700);
+        addLine("connection status:   SUSPICIOUS", "red");
+        await sleep(500);
+        addLine("authentication:      UNKNOWN", "yellow");
+        await sleep(500);
+        addLine("network state:       MONITORED", "yellow");
+        await sleep(700);
+
+        await typeLine("> final security assessment ...", "dim");
+        await sleep(1200);
+
+        addLine("", "line");
+        addLine("████████████████████████████ 100%", "red");
+        await sleep(1200);
+
+        addLine("[!] analysis complete", "yellow");
+        await sleep(1200);
+        addLine("[!] operator intervention required", "red");
+        await sleep(1000);
+        addLine("> session remains under observation ...", "dim");
+        await sleep(1200);
+        addLine("> do not close this window.", "red");
+        await sleep(1500);
+        addLine("> awaiting operator", "white");
+
+        // blinking cursor at the end
+        const lastLine = terminal.lastChild;
+        const cursorSpan = document.createElement("span");
+        cursorSpan.className = "cursor";
+        lastLine.appendChild(cursorSpan);
+    }
+
+    main();
+</script>
+</body>
+</html>
