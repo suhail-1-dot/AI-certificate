@@ -1,4 +1,253 @@
-/* TERMINAL SCREEN */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Quantity Surveying Fundamentals | Free Certificate Course</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f6f6f6;
+    color: #222;
+    line-height: 1.7;
+}
+
+/* ================= HEADER ================= */
+
+header {
+    background: #20252a;
+    color: white;
+    padding: 17px 8%;
+}
+
+.header-inner {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.header-link {
+    font-size: 13px;
+    color: #ccc;
+}
+
+
+/* ================= HERO ================= */
+
+.hero {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    padding: 65px 8%;
+}
+
+.hero-inner {
+    max-width: 1100px;
+    margin: auto;
+}
+
+.category {
+    color: #777;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+h1 {
+    font-size: 42px;
+    line-height: 1.2;
+    font-weight: 600;
+    max-width: 850px;
+    margin: 0 0 18px;
+}
+
+.subtitle {
+    max-width: 780px;
+    color: #555;
+    font-size: 18px;
+}
+
+.course-button {
+    display: inline-block;
+    margin-top: 22px;
+    padding: 12px 25px;
+    background: #222;
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+
+/* ================= COURSE INFO ================= */
+
+.info-section {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.info {
+    max-width: 1100px;
+    margin: auto;
+    padding: 28px 8%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.info-item {
+    font-size: 13px;
+}
+
+.info-item strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.info-item span {
+    color: #777;
+}
+
+
+/* ================= MAIN CONTENT ================= */
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 45px 8%;
+}
+
+.article {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 45px;
+}
+
+.article h2 {
+    font-size: 27px;
+    margin-top: 45px;
+    margin-bottom: 15px;
+    color: #222;
+}
+
+.article h2:first-child {
+    margin-top: 0;
+}
+
+.article h3 {
+    font-size: 20px;
+    margin-top: 30px;
+}
+
+.article p {
+    color: #444;
+}
+
+.article li {
+    margin-bottom: 7px;
+    color: #444;
+}
+
+
+/* ================= NOTE BOX ================= */
+
+.note {
+    border-left: 4px solid #444;
+    background: #f4f4f4;
+    padding: 18px 20px;
+    margin: 25px 0;
+}
+
+.note strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+
+/* ================= BOQ TABLE ================= */
+
+.table-wrapper {
+    overflow-x: auto;
+    margin: 25px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 11px;
+    text-align: left;
+}
+
+th {
+    background: #eeeeee;
+}
+
+
+/* ================= MODULES ================= */
+
+.module {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 12px 0;
+    background: #fafafa;
+}
+
+.module strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+
+/* ================= FAQ ================= */
+
+.faq {
+    border-top: 1px solid #ddd;
+    padding: 18px 0;
+}
+
+.faq strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+
+/* ================= FOOTER ================= */
+
+footer {
+    background: #20252a;
+    color: #bbb;
+    padding: 30px 8%;
+    font-size: 13px;
+}
+
+.footer-inner {
+    max-width: 1100px;
+    margin: auto;
+}
+
+
+/* ================= TERMINAL ================= */
 
 #terminalPage {
     display: none;
@@ -6,7 +255,12 @@
     background: #000;
     color: #d0d0d0;
     padding: 25px;
-    font-family: Consolas, "Courier New", monospace;
+    font-family:
+        "Cascadia Mono",
+        "Cascadia Code",
+        Consolas,
+        "Liberation Mono",
+        monospace;
     font-size: 14px;
     line-height: 1.7;
 }
@@ -35,6 +289,7 @@
     height: 16px;
     background: #ccc;
     animation: blink 1s infinite;
+    vertical-align: middle;
 }
 
 @keyframes blink {
@@ -42,67 +297,1087 @@
         opacity: 0;
     }
 }
-</body>
-<!-- TERMINAL SCREEN -->
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 750px) {
+
+    h1 {
+        font-size: 32px;
+    }
+
+    .info {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .article {
+        padding: 25px;
+    }
+
+    #terminalPage {
+        padding: 15px;
+        font-size: 12px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NORMAL COURSE WEBSITE
+===================================================== -->
+
+<div id="coursePage">
+
+
+<header>
+
+    <div class="header-inner">
+
+        <div class="logo">
+            Learning Academy
+        </div>
+
+        <div class="header-link">
+            Online Professional Education
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<section class="hero">
+
+    <div class="hero-inner">
+
+        <div class="category">
+            Construction & Built Environment
+        </div>
+
+        <h1>
+            Quantity Surveying Fundamentals
+        </h1>
+
+        <p class="subtitle">
+
+            A practical introduction to construction measurement,
+            cost planning, estimating, procurement, tendering and
+            commercial management for beginners.
+
+        </p>
+
+        <a href="#course" class="course-button">
+            Start Course
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<section class="info-section">
+
+    <div class="info">
+
+        <div class="info-item">
+            <strong>Level</strong>
+            <span>Beginner</span>
+        </div>
+
+        <div class="info-item">
+            <strong>Duration</strong>
+            <span>4 Weeks</span>
+        </div>
+
+        <div class="info-item">
+            <strong>Study Mode</strong>
+            <span>Online</span>
+        </div>
+
+        <div class="info-item">
+            <strong>Certificate</strong>
+            <span>Certificate of Completion</span>
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<div class="container" id="course">
+
+<div class="article">
+
+
+<h2>
+Introduction to Quantity Surveying
+</h2>
+
+<p>
+
+Quantity surveying is a professional discipline within the
+construction industry concerned with the financial and commercial
+management of construction projects.
+
+</p>
+
+<p>
+
+A quantity surveyor may become involved from the early stages of a
+project, when a client is considering whether a proposed development
+is financially realistic, through design development, procurement,
+construction and completion.
+
+</p>
+
+<p>
+
+The role involves much more than simply measuring quantities.
+Quantity surveyors work with architects, engineers, contractors,
+clients and other professionals to understand the scope of a project
+and manage its financial aspects.
+
+</p>
+
+
+<div class="note">
+
+<strong>Learning objective</strong>
+
+By the end of this module, learners should understand the basic role
+of a quantity surveyor and how cost information is used during the
+different stages of a construction project.
+
+</div>
+
+
+
+<h2>
+1. What Does a Quantity Surveyor Do?
+</h2>
+
+<p>
+
+The responsibilities of a quantity surveyor vary depending on the
+project, employer and stage of construction.
+
+</p>
+
+<p>
+Typical activities can include:
+</p>
+
+<ul>
+
+<li>Preparing preliminary cost estimates.</li>
+
+<li>Developing cost plans.</li>
+
+<li>Measuring construction work.</li>
+
+<li>Preparing or reviewing Bills of Quantities.</li>
+
+<li>Preparing tender documentation.</li>
+
+<li>Analysing contractor tenders.</li>
+
+<li>Monitoring project expenditure.</li>
+
+<li>Assessing variations to the works.</li>
+
+<li>Valuing completed construction work.</li>
+
+<li>Assisting with contractual and commercial matters.</li>
+
+<li>Preparing or agreeing final accounts.</li>
+
+</ul>
+
+
+
+<h2>
+2. Construction Cost Planning
+</h2>
+
+<p>
+
+Cost planning is an important part of the early stages of a
+construction project. Before construction begins, the client needs
+to understand whether the proposed project can be delivered within
+the available budget.
+
+</p>
+
+<p>
+
+At the beginning of a project, information may be limited. As the
+design develops, the estimate can become increasingly detailed.
+
+</p>
+
+<p>
+
+A quantity surveyor may therefore review the cost of different
+building elements and compare the developing design against the
+available budget.
+
+</p>
+
+<p>
+
+For example, changing the specification of finishes, structural
+systems, mechanical systems or building materials can affect the
+overall project cost.
+
+</p>
+
+
+
+<h2>
+3. Measurement in Quantity Surveying
+</h2>
+
+<p>
+
+Measurement is one of the fundamental technical activities within
+quantity surveying.
+
+</p>
+
+<p>
+
+Construction drawings contain information about the work that needs
+to be constructed. A quantity surveyor interprets this information
+and determines quantities that can subsequently be priced.
+
+</p>
+
+<p>
+
+Depending on the work being measured, quantities may be expressed in
+different units.
+
+</p>
+
+<ul>
+
+<li>Length — metres (m)</li>
+
+<li>Area — square metres (m²)</li>
+
+<li>Volume — cubic metres (m³)</li>
+
+<li>Number — items (nr)</li>
+
+<li>Weight — kilograms or tonnes</li>
+
+</ul>
+
+<p>
+
+Standard measurement rules are important because they provide a
+consistent approach to describing and measuring construction work.
+
+</p>
+
+
+
+<h2>
+4. Bills of Quantities
+</h2>
+
+<p>
+
+A Bill of Quantities, commonly abbreviated as BOQ, is a structured
+document containing descriptions and measured quantities of work
+associated with a construction project.
+
+</p>
+
+<p>
+
+A BOQ can provide contractors with a consistent basis for pricing
+construction work. It can also provide useful information for
+subsequent cost management and valuation.
+
+</p>
+
+
+<h3>
+Simple BOQ Example
+</h3>
+
+
+<div class="table-wrapper">
+
+<table>
+
+<tr>
+
+<th>Item</th>
+<th>Description</th>
+<th>Unit</th>
+<th>Quantity</th>
+<th>Rate</th>
+<th>Amount</th>
+
+</tr>
+
+<tr>
+
+<td>1</td>
+<td>Excavation</td>
+<td>m³</td>
+<td>25</td>
+<td>2,500</td>
+<td>62,500</td>
+
+</tr>
+
+<tr>
+
+<td>2</td>
+<td>Concrete</td>
+<td>m³</td>
+<td>15</td>
+<td>28,000</td>
+<td>420,000</td>
+
+</tr>
+
+<tr>
+
+<td>3</td>
+<td>Blockwork</td>
+<td>m²</td>
+<td>120</td>
+<td>4,500</td>
+<td>540,000</td>
+
+</tr>
+
+<tr>
+
+<td>4</td>
+<td>Floor finishes</td>
+<td>m²</td>
+<td>100</td>
+<td>6,000</td>
+<td>600,000</td>
+
+</tr>
+
+</table>
+
+</div>
+
+<p>
+
+The example above demonstrates the basic relationship between
+quantity, unit rate and total amount. In a real project, a BOQ can
+contain many sections and considerably more detailed descriptions.
+
+</p>
+
+
+
+<h2>
+5. Estimating Construction Costs
+</h2>
+
+<p>
+
+Construction estimating involves predicting the likely cost of
+carrying out a defined scope of work.
+
+</p>
+
+<p>
+
+A construction estimate can include many different components,
+including materials, labour, plant, subcontractor work, preliminaries,
+overheads, profit and allowances for risks or uncertainties.
+
+</p>
+
+<p>
+
+The accuracy of an estimate depends heavily on the quality of the
+available information.
+
+</p>
+
+<div class="note">
+
+<strong>Important concept</strong>
+
+An early-stage estimate should not automatically be treated as the
+same thing as a final construction price. Estimates develop as the
+design and project information become more detailed.
+
+</div>
+
+
+
+<h2>
+6. Procurement Methods
+</h2>
+
+<p>
+
+Procurement describes the approach used to organise the design,
+construction and contractual relationships within a project.
+
+</p>
+
+<p>
+
+Different procurement strategies allocate responsibilities and
+risks differently.
+
+</p>
+
+<p>
+Examples include:
+</p>
+
+<ul>
+
+<li>Traditional procurement.</li>
+
+<li>Design and build.</li>
+
+<li>Management contracting.</li>
+
+<li>Construction management.</li>
+
+</ul>
+
+<p>
+
+The choice of procurement route can influence cost certainty,
+programme, risk allocation, design responsibility and the relationship
+between the client and contractor.
+
+</p>
+
+
+
+<h2>
+7. Tendering
+</h2>
+
+<p>
+
+Tendering is the process through which contractors submit proposals
+and prices for carrying out defined construction work.
+
+</p>
+
+<p>
+
+Tender documents normally need to provide sufficient information for
+contractors to understand what is required.
+
+</p>
+
+<p>
+
+A quantity surveyor may assist with preparing tender documentation,
+issuing pricing information, answering commercial queries, analysing
+submitted prices and preparing recommendations.
+
+</p>
+
+
+
+<h2>
+8. Cost Control During Construction
+</h2>
+
+<p>
+
+Preparing a budget before construction starts is only one part of
+commercial management.
+
+</p>
+
+<p>
+
+During construction, the actual financial position of the project
+needs to be monitored.
+
+</p>
+
+<p>
+
+Costs can change because of design changes, variations, delays,
+material price changes, additional work, errors or unforeseen site
+conditions.
+
+</p>
+
+<p>
+
+Effective cost control attempts to identify changes early so that
+the project team can understand their financial consequences.
+
+</p>
+
+
+
+<h2>
+9. Variations and Changes
+</h2>
+
+<p>
+
+Construction projects frequently experience changes after the
+original scope has been established.
+
+</p>
+
+<p>
+
+For example, a client may request a different floor finish, an
+architect may revise a design detail, or a site condition may require
+additional work.
+
+</p>
+
+<p>
+
+Such changes can have financial and programme consequences.
+
+</p>
+
+<p>
+
+The commercial team therefore needs to record, assess and value
+changes in accordance with the relevant contract procedures.
+
+</p>
+
+
+
+<h2>
+10. Contract Administration
+</h2>
+
+<p>
+
+Construction contracts establish the rights, responsibilities and
+procedures applicable to the parties involved in a project.
+
+</p>
+
+<p>
+
+Depending on the contract and role, quantity surveyors may become
+involved in valuations, payment processes, variations, claims,
+commercial reporting and final accounts.
+
+</p>
+
+<p>
+
+Understanding the contract is therefore an important part of
+professional quantity surveying practice.
+
+</p>
+
+
+
+<h2>
+11. Lifecycle Costing
+</h2>
+
+<p>
+
+The initial construction price is not necessarily the only cost that
+matters to a building owner.
+
+</p>
+
+<p>
+
+A building may generate costs throughout its life, including
+operation, maintenance, repair, replacement and eventual disposal.
+
+</p>
+
+<p>
+
+Lifecycle costing considers costs over a longer period rather than
+looking only at the initial construction expenditure.
+
+</p>
+
+
+
+<h2>
+12. Quantity Surveying and Digital Technology
+</h2>
+
+<p>
+
+Digital technology has changed many aspects of construction
+measurement and cost management.
+
+</p>
+
+<p>
+
+Building Information Modelling, commonly known as BIM, can provide
+structured digital information about building elements and systems.
+
+</p>
+
+<p>
+
+Digital measurement and estimating tools can also help professionals
+manage large quantities of project information more efficiently.
+
+</p>
+
+<p>
+
+However, technology does not remove the need for professional
+judgement. The information being used still needs to be checked,
+interpreted and understood.
+
+</p>
+
+
+
+<h2>
+13. Skills Required by a Quantity Surveyor
+</h2>
+
+<p>
+
+Quantity surveying combines technical, commercial and communication
+skills.
+
+</p>
+
+<p>
+Important skills include:
+</p>
+
+<ul>
+
+<li>Construction knowledge.</li>
+
+<li>Measurement.</li>
+
+<li>Cost estimating.</li>
+
+<li>Numerical accuracy.</li>
+
+<li>Contract awareness.</li>
+
+<li>Analytical thinking.</li>
+
+<li>Report writing.</li>
+
+<li>Negotiation.</li>
+
+<li>Communication.</li>
+
+<li>Attention to detail.</li>
+
+<li>Computer and digital skills.</li>
+
+</ul>
+
+
+
+<h2>
+Course Modules
+</h2>
+
+
+<div class="module">
+
+<strong>Module 01 — Introduction to Quantity Surveying</strong>
+
+Understanding the profession, project stages and the role of the
+quantity surveyor.
+
+</div>
+
+
+<div class="module">
+
+<strong>Module 02 — Construction Measurement</strong>
+
+Basic measurement principles, units and descriptions of construction
+work.
+
+</div>
+
+
+<div class="module">
+
+<strong>Module 03 — Estimating and Cost Planning</strong>
+
+Understanding estimates, rates, budgets and cost planning.
+
+</div>
+
+
+<div class="module">
+
+<strong>Module 04 — Bills of Quantities</strong>
+
+Understanding BOQs and how measured quantities can be organised for
+pricing.
+
+</div>
+
+
+<div class="module">
+
+<strong>Module 05 — Procurement and Tendering</strong>
+
+Introduction to procurement strategies and contractor tendering.
+
+</div>
+
+
+<div class="module">
+
+<strong>Module 06 — Construction Cost Control</strong>
+
+Monitoring expenditure, variations and commercial changes.
+
+</div>
+
+
+<div class="module">
+
+<strong>Module 07 — Contracts and Final Accounts</strong>
+
+Introduction to contract administration and completion of project
+accounts.
+
+</div>
+
+
+
+<h2>
+Frequently Asked Questions
+</h2>
+
+
+<div class="faq">
+
+<strong>
+Is quantity surveying only about mathematics?
+</strong>
+
+Quantity surveying involves numerical work, but it also requires
+construction knowledge, commercial understanding, communication and
+analysis.
+
+</div>
+
+
+<div class="faq">
+
+<strong>
+Do I need construction experience to start learning?
+</strong>
+
+No. This introductory course is designed to introduce the basic
+concepts to beginners.
+
+</div>
+
+
+<div class="faq">
+
+<strong>
+What is a BOQ?
+</strong>
+
+A Bill of Quantities is a structured document containing descriptions
+and measured quantities of construction work that can be priced.
+
+</div>
+
+
+<div class="faq">
+
+<strong>
+Where can quantity surveyors work?
+</strong>
+
+Quantity surveyors can work for consulting practices, contractors,
+developers, government organisations and other organisations involved
+in construction and property development.
+
+</div>
+
+
+<div class="faq">
+
+<strong>
+Is this course suitable for students?
+</strong>
+
+Yes. The material is intended as an introductory learning resource
+for students and beginners interested in construction cost management.
+
+</div>
+
+
+
+<h2>
+End of Module
+</h2>
+
+<p>
+
+You have now completed the introductory reading section of the
+Quantity Surveying Fundamentals course.
+
+</p>
+
+<p>
+
+Before proceeding to the assessment, review the concepts of
+measurement, estimating, Bills of Quantities, procurement, tendering
+and cost control.
+
+</p>
+
+
+<div class="note">
+
+<strong>Assessment preparation</strong>
+
+Make sure you understand the difference between an estimate, a BOQ,
+a tender and the actual cost of construction before continuing.
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<footer>
+
+<div class="footer-inner">
+
+© 2026 Learning Academy  
+<br>
+Quantity Surveying Fundamentals — Online Learning Resource
+
+</div>
+
+</footer>
+
+</div>
+
+
+
+<!-- =====================================================
+     TERMINAL SCREEN
+===================================================== -->
 
 <div id="terminalPage">
-    <div id="terminal"></div>
+
+<div id="terminal"></div>
+
 </div>
+
+
+
 <script>
 
-const coursePage = document.getElementById("coursePage");
-const terminalPage = document.getElementById("terminalPage");
-const terminal = document.getElementById("terminal");
+/*
+    The first page remains visible for approximately
+    45 seconds so the visitor can read the course.
+*/
 
-const lines = [
-    ["$ init course-session", "", 800],
-    ["[ OK ] loading course environment", "ok", 900],
-    ["$ verify session", "", 800],
-    ["[ OK ] connection established", "ok", 900],
-    ["$ run diagnostic", "", 900],
-    ["$ checking course session...", "", 1000],
-    ["[ OK ] browser session detected", "ok", 800],
-    ["$ checking session state...", "", 1100],
-    ["[WARNING] unexpected session state", "warning", 1400],
-    ["", "", 500],
-    ["$ checking security status...", "", 1000],
-    ["[WARNING] SESSION INTEGRITY CHECK FAILED", "warning", 1500],
-    ["", "", 500],
-    ["$ attempting recovery...", "", 900],
-    ["$ recovery attempt 1/3", "", 800],
-    ["$ recovery attempt 2/3", "", 800],
-    ["$ recovery attempt 3/3", "", 1000],
-    ["[ERROR] recovery failed", "error", 1500],
-    ["", "", 500],
-    ["----------------------------------------", "", 500],
-    ["SECURITY DIAGNOSTIC COMPLETE", "", 1200],
-    ["STATUS: MANUAL INTERVENTION REQUIRED", "error", 1500],
-    ["", "", 500],
-    ["No action has been performed on this device.", "ok", 1200]
+const coursePage =
+    document.getElementById("coursePage");
+
+const terminalPage =
+    document.getElementById("terminalPage");
+
+const terminal =
+    document.getElementById("terminal");
+
+
+const terminalLines = [
+
+    {
+        text: "$ init course-session",
+        type: "normal",
+        delay: 900
+    },
+
+    {
+        text: "[ OK ] loading course environment",
+        type: "ok",
+        delay: 1000
+    },
+
+    {
+        text: "$ verify session",
+        type: "normal",
+        delay: 900
+    },
+
+    {
+        text: "[ OK ] connection established",
+        type: "ok",
+        delay: 1100
+    },
+
+    {
+        text: "$ run diagnostic",
+        type: "normal",
+        delay: 1100
+    },
+
+    {
+        text: "$ checking course session...",
+        type: "normal",
+        delay: 1200
+    },
+
+    {
+        text: "[ OK ] browser session detected",
+        type: "ok",
+        delay: 1000
+    },
+
+    {
+        text: "$ checking session state...",
+        type: "normal",
+        delay: 1300
+    },
+
+    {
+        text: "[WARN] unexpected session state",
+        type: "warning",
+        delay: 1400
+},
+{
+    text: "",
+    type: "",
+    delay: 500
+},
+{
+    text: "$ checking security status...",
+    type: "",
+    delay: 1000
+},
+{
+    text: "[WARNING] SESSION INTEGRITY CHECK FAILED",
+    type: "warning",
+    delay: 1500
+},
+{
+    text: "",
+    type: "",
+    delay: 500
+},
+{
+    text: "$ attempting recovery...",
+    type: "",
+    delay: 900
+},
+{
+    text: "$ recovery attempt 1/3",
+    type: "",
+    delay: 800
+},
+{
+    text: "$ recovery attempt 2/3",
+    type: "",
+    delay: 800
+},
+{
+    text: "$ recovery attempt 3/3",
+    type: "",
+    delay: 1000
+},
+{
+    text: "[ERROR] recovery failed",
+    type: "error",
+    delay: 1500
+},
+{
+    text: "",
+    type: "",
+    delay: 500
+},
+{
+    text: "----------------------------------------",
+    type: "",
+    delay: 500
+},
+{
+    text: "SECURITY DIAGNOSTIC COMPLETE",
+    type: "",
+    delay: 1200
+},
+{
+    text: "STATUS: MANUAL INTERVENTION REQUIRED",
+    type: "error",
+    delay: 1500
+},
+{
+    text: "",
+    type: "",
+    delay: 500
+},
+{
+    text: "No action has been performed on this device.",
+    type: "ok",
+    delay: 1200
+}
 ];
 
-function showLine(i) {
+function showLine(index) {
 
-    if (i >= lines.length) {
+    if (index >= lines.length) {
         terminal.innerHTML += '<span class="cursor"></span>';
         return;
     }
 
-    const item = lines[i];
+    const item = lines[index];
 
     const line = document.createElement("div");
 
-    line.textContent = item[0];
+    line.textContent = item.text;
 
-    if (item[1]) {
-        line.className = item[1];
+    if (item.type) {
+        line.className = item.type;
     }
 
     terminal.appendChild(line);
 
     setTimeout(function() {
-        showLine(i + 1);
-    }, item[2]);
+        showLine(index + 1);
+    }, item.delay);
 }
 
 function beginTerminal() {
@@ -116,21 +1391,8 @@ function beginTerminal() {
     showLine(0);
 }
 
-
-/* 45000 milliseconds = 45 seconds */
-
 setTimeout(function() {
     beginTerminal();
 }, 45000);
 
 </script>
-<div id="terminalPage">
-    <div id="terminal"></div>
-</div>
-
-<script>
-    ...Part 3...
-</script>
-
-</body>
-</html>
