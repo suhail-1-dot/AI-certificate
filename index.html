@@ -28,7 +28,7 @@ html, body {
 .led.bad { background: #c96666; color: #c96666; }
 @keyframes blink { 50% { opacity: 0.3; } }
 
-.main { height: calc(100% - 36px); display: grid; grid-template-columns: 1fr 520px; }
+.main { height: calc(100% - 36px); display: grid; grid-template-columns: 1fr 560px; }
 
 .term-wrap {
     background: #05070a; border-right: 1px solid #141a22;
@@ -60,6 +60,7 @@ html, body {
 .t-val   { color: #d8e0ec; }
 .t-name  { color: #d47a7a; font-weight: bold; letter-spacing: 2px; }
 .t-head  { color: #e8edf5; font-weight: bold; letter-spacing: 1px; }
+.t-err   { color: #c96666; }
 .t-creep { color: #d47a7a; letter-spacing: 2px; }
 
 .cursor { display: inline-block; width: 8px; height: 14px; background: #c8d0dc; vertical-align: middle; animation: blink 1s infinite; }
@@ -68,7 +69,7 @@ html, body {
 
 .info-panel {
     flex: 1; overflow-y: auto; background: #0a0d12;
-    padding: 14px 16px; font-size: 12.5px; line-height: 1.65;
+    padding: 14px 16px; font-size: 12.5px; line-height: 1.6;
     scrollbar-width: thin; scrollbar-color: #1a2028 #0a0d12;
     border-bottom: 1px solid #141a22;
     font-family: Consolas, monospace;
@@ -76,18 +77,37 @@ html, body {
 .info-panel::-webkit-scrollbar { width: 8px; }
 .info-panel::-webkit-scrollbar-thumb { background: #1a2028; }
 
-.gline {
-    color: #b0b8c4; font-size: 12.5px; line-height: 1.6;
-    padding: 0.5px 0; white-space: pre-wrap; word-break: break-word;
+.shdr {
+    color: #4a5464; font-size: 10.5px; letter-spacing: 2.5px;
+    text-transform: uppercase; margin: 12px 0 5px;
+    padding-bottom: 3px; border-bottom: 1px dashed #1a2028;
 }
-.gline .tag { color: #6b7688; }
-.gline .key { color: #8a94a6; }
-.gline .val { color: #d8e0ec; }
+.shdr:first-child { margin-top: 0; }
+
+.gline {
+    color: #b0b8c4; font-size: 12px; line-height: 1.6;
+    padding: 1px 0; white-space: pre-wrap; word-break: break-word;
+    display: flex; gap: 10px; align-items: baseline;
+}
+.gline .tag { color: #5a6578; width: 58px; flex-shrink: 0; font-size: 11px; }
+.gline .key { color: #8a94a6; min-width: 200px; flex-shrink: 0; }
+.gline .arrow { color: #3a4353; margin: 0 2px; }
+.gline .val { color: #d8e0ec; word-break: break-word; }
 .gline.priority .val { color: #e8edf5; font-weight: bold; }
+.gline.battery .val {
+    color: #e8edf5; font-weight: bold; font-size: 13px;
+    background: #10161d; padding: 1px 8px;
+    border: 1px solid #2a3a4a; border-radius: 2px;
+}
+.gline.err .val { color: #c96666; }
+.gline.err .tag { color: #c96666; }
+.gline.warn .val { color: #d4a04a; }
+.gline.warn .tag { color: #d4a04a; }
+.gline.dim .val { color: #6b7688; }
 
 .upload-panel {
     background: #080a0e; border-top: 1px solid #141a22;
-    padding: 12px 16px; height: 240px;
+    padding: 12px 16px; height: 220px;
     display: none; flex-direction: column; font-size: 12px;
 }
 .upload-panel.show { display: flex; }
@@ -126,6 +146,7 @@ html, body {
 .h-line { min-height: 20px; }
 .h-ok   { color: #b0b0b0; }
 .h-warn { color: #d4a04a; }
+.h-err  { color: #c96666; }
 .h-creepy { color: #d47a7a; font-weight: bold; letter-spacing: 5px; font-size: 24px; }
 
 .shake { animation: shake 0.28s infinite; }
@@ -151,11 +172,7 @@ html, body {
 </style>
 </head>
 <body>
-<h3> Microphone </h3>
 
-<button id="micButton">Turn the Microphone off</button>
-
-<p id="micResult"></p>
 <div id="errBanner"></div>
 
 <div class="topbar">
@@ -205,7 +222,6 @@ html, body {
 </div>
 
 <script>
-/* ---------- SAFE HELPERS ---------- */
 const $ = id => document.getElementById(id);
 const term = $("term");
 const infoPanel = $("infoPanel");
@@ -227,17 +243,29 @@ function writeTerm(html) {
         term.scrollTop = term.scrollHeight;
     } catch (e) {}
 }
-function writeInfo(key, val, priority) {
-    try {
-        const line = document.createElement("div");
-        line.className = "gline" + (priority ? " priority" : "");
-        line.innerHTML =
-            '<span class="tag">[detect]</span> ' +
-            '<span class="key">' + key + '</span> ' +
-            '<span class="val">' + val + '</span>';
-        infoPanel.appendChild(line);
-        infoPanel.scrollTop = infoPanel.scrollHeight;
-    } catch (e) {}
+function writeSection(title) {
+    const h = document.createElement("div");
+    h.className = "shdr";
+    h.textContent = "▸ " + title;
+    infoPanel.appendChild(h);
+    infoPanel.scrollTop = infoPanel.scrollHeight;
+}
+function writeInfo(key, val, opts) {
+    opts = opts || {};
+    const line = document.createElement("div");
+    line.className = "gline"
+        + (opts.priority ? " priority" : "")
+        + (opts.battery ? " battery" : "")
+        + (opts.err ? " err" : "")
+        + (opts.warn ? " warn" : "")
+        + (opts.dim ? " dim" : "");
+    line.innerHTML =
+        '<span class="tag">' + (opts.tag || "[detect]") + '</span>' +
+        '<span class="key">' + key + '</span>' +
+        '<span class="arrow">→</span>' +
+        '<span class="val">' + val + '</span>';
+    infoPanel.appendChild(line);
+    infoPanel.scrollTop = infoPanel.scrollHeight;
 }
 
 /* ---------- TARGET ---------- */
@@ -255,16 +283,31 @@ function pickTargetName() {
 }
 const TARGET = pickTargetName();
 
-/* ---------- SAFE COLLECTORS ---------- */
+/* ---------- SAFE ---------- */
 const info = {};
-function safe(fn, fallback) {
-    try { return fn(); } catch (e) { return fallback; }
+function safe(fn, fallback) { try { return fn(); } catch (e) { return fallback; } }
+function rnd(min, max, dec) {
+    const v = Math.random() * (max - min) + min;
+    return dec ? v.toFixed(dec) : Math.round(v);
 }
+function rndHex(len) {
+    let s = "";
+    for (let i = 0; i < len; i++) s += Math.floor(Math.random() * 16).toString(16);
+    return s;
+}
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-function collectAll() {
+/* ---------- REAL COLLECTORS ---------- */
+function collectReal() {
     const n = navigator, s = screen;
 
     info.platform = safe(() => n.platform || "unknown", "unknown");
+    info.userAgent = safe(() => n.userAgent || "unknown", "unknown");
+    info.vendor = safe(() => n.vendor || "n/a", "n/a");
+    info.product = safe(() => n.product || "n/a", "n/a");
+    info.appName = safe(() => n.appName || "n/a", "n/a");
+    info.appVersion = safe(() => n.appVersion || "n/a", "n/a");
+    info.appCodeName = safe(() => n.appCodeName || "n/a", "n/a");
     info.language = safe(() => n.language || "unknown", "unknown");
     info.languages = safe(() => (n.languages || []).join(", ") || "—", "—");
     info.timezone = safe(() => Intl.DateTimeFormat().resolvedOptions().timeZone, "unknown");
@@ -272,30 +315,51 @@ function collectAll() {
         const off = new Date().getTimezoneOffset();
         return "UTC" + (off > 0 ? "-" : "+") + Math.abs(off / 60);
     }, "UTC+0");
+    info.locale = safe(() => Intl.DateTimeFormat().resolvedOptions().locale, "unknown");
     info.cookies = safe(() => n.cookieEnabled ? "true" : "false", "unknown");
     info.online = safe(() => n.onLine ? "true" : "false", "unknown");
+    info.webdriver = safe(() => n.webdriver ? "yes" : "no", "no");
+    info.dnt = safe(() => (n.doNotTrack === "1" || window.doNotTrack === "1") ? "on" : "off", "off");
+    info.pdfViewer = safe(() => n.pdfViewerEnabled ? "yes" : "no", "n/a");
+    info.plugins = safe(() => n.plugins ? n.plugins.length : 0, 0);
+    info.mimeTypes = safe(() => n.mimeTypes ? n.mimeTypes.length : 0, 0);
+
     info.screenW = safe(() => s.width, 0);
     info.screenH = safe(() => s.height, 0);
     info.availW = safe(() => s.availWidth, 0);
     info.availH = safe(() => s.availHeight, 0);
     info.viewW = safe(() => window.innerWidth, 0);
     info.viewH = safe(() => window.innerHeight, 0);
+    info.outerW = safe(() => window.outerWidth, 0);
+    info.outerH = safe(() => window.outerHeight, 0);
     info.depth = safe(() => s.colorDepth + "-bit", "—");
+    info.pixelDepth = safe(() => s.pixelDepth + "-bit", "—");
     info.dpr = safe(() => window.devicePixelRatio || 1, 1);
     info.orientation = safe(() => (s.orientation && s.orientation.type) || "unknown", "unknown");
+    info.orientationAngle = safe(() => (s.orientation && s.orientation.angle) || 0, 0);
+
+    info.colorGamut = safe(() =>
+        matchMedia("(color-gamut: rec2020)").matches ? "rec2020" :
+        matchMedia("(color-gamut: p3)").matches ? "p3" :
+        matchMedia("(color-gamut: srgb)").matches ? "srgb" : "unknown", "unknown");
+    info.prefScheme = safe(() => matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light", "unknown");
+    info.reducedMotion = safe(() => matchMedia("(prefers-reduced-motion: reduce)").matches ? "reduce" : "no-preference", "unknown");
+    info.pointerType = safe(() =>
+        matchMedia("(pointer: fine)").matches ? "fine" :
+        matchMedia("(pointer: coarse)").matches ? "coarse" : "none", "unknown");
+    info.hover = safe(() => matchMedia("(hover: hover)").matches ? "yes" : "no", "unknown");
+
     info.cores = safe(() => n.hardwareConcurrency || "unknown", "unknown");
     info.memory = safe(() => n.deviceMemory ? n.deviceMemory + " GB" : "unavailable", "unavailable");
     info.touch = safe(() => n.maxTouchPoints || 0, 0);
-    info.dnt = safe(() => (n.doNotTrack === "1" || window.doNotTrack === "1") ? "on" : "off", "off");
-    info.pdfViewer = safe(() => n.pdfViewerEnabled ? "yes" : "no", "n/a");
-    info.plugins = safe(() => n.plugins ? n.plugins.length : 0, 0);
 
     const c = safe(() => n.connection || n.mozConnection || n.webkitConnection, null);
     if (c) {
         info.connType = safe(() => c.effectiveType || "unknown", "unknown");
         info.connDown = safe(() => c.downlink ? c.downlink + " Mbps" : "n/a", "n/a");
         info.connRtt  = safe(() => c.rtt ? c.rtt + " ms" : "n/a", "n/a");
-    } else { info.connType = "n/a"; info.connDown = "n/a"; info.connRtt = "n/a"; }
+        info.connSave = safe(() => c.saveData ? "on" : "off", "off");
+    } else { info.connType = "n/a"; info.connDown = "n/a"; info.connRtt = "n/a"; info.connSave = "n/a"; }
 
     try {
         const cv = document.createElement("canvas");
@@ -306,8 +370,11 @@ function collectAll() {
             info.gpuVendor = dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : "hidden";
             info.webgl = "supported";
             info.webglExtCount = (gl.getSupportedExtensions() || []).length;
-        } else { info.gpu = "n/a"; info.gpuVendor = "n/a"; info.webgl = "no"; info.webglExtCount = 0; }
-    } catch (e) { info.gpu = "n/a"; info.gpuVendor = "n/a"; info.webgl = "err"; info.webglExtCount = 0; }
+            info.maxTexture = safe(() => gl.getParameter(gl.MAX_TEXTURE_SIZE), "n/a");
+            info.webglVersion = safe(() => gl.getParameter(gl.VERSION), "n/a");
+            info.glslVersion = safe(() => gl.getParameter(gl.SHADING_LANGUAGE_VERSION), "n/a");
+        } else { info.gpu = "n/a"; info.gpuVendor = "n/a"; info.webgl = "no"; info.webglExtCount = 0; info.maxTexture = "n/a"; info.webglVersion = "n/a"; info.glslVersion = "n/a"; }
+    } catch (e) { info.gpu = "n/a"; info.gpuVendor = "n/a"; info.webgl = "err"; info.webglExtCount = 0; info.maxTexture = "n/a"; info.webglVersion = "n/a"; info.glslVersion = "n/a"; }
 
     info.canvasHash = safe(() => {
         const c2 = document.createElement("canvas");
@@ -347,7 +414,7 @@ function collectAll() {
     info.codecs = safe(() => {
         const v = document.createElement("video");
         const list = [];
-        const tests = { h264: 'video/mp4; codecs="avc1.42E01E"', vp8: 'video/webm; codecs="vp8"', vp9: 'video/webm; codecs="vp9"' };
+        const tests = { h264: 'video/mp4; codecs="avc1.42E01E"', vp8: 'video/webm; codecs="vp8"', vp9: 'video/webm; codecs="vp9"', av1: 'video/mp4; codecs="av01.0.05M.08"' };
         for (const k in tests) if (v.canPlayType(tests[k])) list.push(k);
         return list.length ? list.join(",") : "none";
     }, "n/a");
@@ -356,9 +423,14 @@ function collectAll() {
         const nav = performance.getEntriesByType("navigation")[0];
         return nav ? Math.round(nav.loadEventEnd - nav.startTime) + " ms" : "n/a";
     }, "n/a");
+    info.domTime = safe(() => {
+        const nav = performance.getEntriesByType("navigation")[0];
+        return nav ? Math.round(nav.domContentLoadedEventEnd - nav.startTime) + " ms" : "n/a";
+    }, "n/a");
     info.heap = safe(() => performance.memory
-        ? (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + " MB"
-        : "n/a", "n/a");
+        ? (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + " MB" : "n/a", "n/a");
+    info.heapLimit = safe(() => performance.memory
+        ? (performance.memory.jsHeapSizeLimit / 1048576).toFixed(1) + " MB" : "n/a", "n/a");
 
     info.apis = safe(() => ({
         "mediaDevices": !!navigator.mediaDevices,
@@ -382,18 +454,146 @@ function collectAll() {
         "speechSynth": !!window.speechSynthesis,
         "xr": !!navigator.xr,
         "paymentRequest": !!window.PaymentRequest,
-        "cryptoSubtle": !!(window.crypto && window.crypto.subtle)
+        "cryptoSubtle": !!(window.crypto && window.crypto.subtle),
+        "battery": !!navigator.getBattery,
+        "storage": !!(navigator.storage && navigator.storage.estimate),
+        "wakeLock": !!navigator.wakeLock,
+        "idleDetection": !!window.IdleDetector
     }), {});
 }
 
+/* ---------- FAKE BUT PLAUSIBLE DATA ---------- */
+/* These numbers look real because they follow the ranges a real sysmon
+   would report. They are generated, not measured — but nothing in the
+   browser can verify them. */
+function generateFake() {
+    // CPU temperature - typical desktop range
+    info.cpuTemp = rnd(42, 71, 1) + " °C";
+    info.cpuTempCore = rnd(38, 74, 1) + " °C";
+    info.cpuLoad = rnd(2, 38) + " %";
+    info.cpuFreq = rnd(2400, 4200) + " MHz";
+
+    // Fan / thermal
+    info.fanRpm = rnd(900, 2200) + " RPM";
+    info.fanDuty = rnd(18, 62) + " %";
+    info.thermalZone = "TZ00 / " + rnd(40, 68, 1) + " °C";
+
+    // Disk (fake - can't read real drive info)
+    info.diskModel = pick(["NVMe SSD 512G", "SATA SSD 1TB", "NVMe SSD 256G", "HDD 2TB"]);
+    info.diskTemp = rnd(28, 48, 1) + " °C";
+    info.diskFree = rnd(12, 340) + " GB";
+    info.diskUsed = rnd(80, 890) + " GB";
+    info.diskHealth = pick(["GOOD", "GOOD", "NORMAL"]);
+    info.diskSerial = "SN-" + rndHex(16).toUpperCase();
+
+    // Fake IP / network identifiers - ranges reserved for examples & private use
+    info.ipLocalHint = pick([
+        "192.168.0." + rnd(2, 254),
+        "192.168.1." + rnd(2, 254),
+        "10.0.0." + rnd(2, 254),
+        "10.0.1." + rnd(2, 254)
+    ]);
+    info.ipPublicHint = pick([
+        "203.0.113." + rnd(2, 254),   // TEST-NET-3 documentation range
+        "198.51.100." + rnd(2, 254),  // TEST-NET-2 documentation range
+        "192.0.2." + rnd(2, 254)      // TEST-NET-1 documentation range
+    ]);
+    info.ipAsn = "AS" + rnd(1000, 65000);
+    info.ipAsnOrg = pick([
+        "Example Transit AS", "Regional ISP Network",
+        "Tier-2 Broadband", "Local Access Provider"
+    ]);
+    info.ipGeoHint = pick([
+        "region-hint: us-east", "region-hint: eu-west",
+        "region-hint: ap-south", "region-hint: ap-southeast"
+    ]);
+
+    // Fake MAC - OUI prefix from common vendors
+    info.macHint = pick(["00:1A:2B","3C:5A:B4","D8:3A:DD","5C:F9:DD","A4:5E:60"]) + ":" +
+                   rndHex(2).toUpperCase() + ":" + rndHex(2).toUpperCase();
+    info.macVendorHint = pick([
+        "vendor-oui: Intel", "vendor-oui: Realtek",
+        "vendor-oui: Qualcomm", "vendor-oui: Broadcom"
+    ]);
+
+    // DNS resolver - plausible public resolvers
+    info.dnsResolver = pick([
+        "1.1.1.1", "1.0.0.1", "8.8.8.8", "8.8.4.4", "9.9.9.9"
+    ]);
+    info.dnsLatency = rnd(4, 45) + " ms";
+
+    // TCP / SSL
+    info.tcpWindow = rnd(64000, 262000);
+    info.tcpMSS = pick([1360, 1380, 1400, 1420, 1440]);
+    info.sslProtocol = pick(["TLSv1.3", "TLSv1.3", "TLSv1.2"]);
+    info.sslCipher = pick([
+        "TLS_AES_256_GCM_SHA384", "TLS_AES_128_GCM_SHA256",
+        "TLS_CHACHA20_POLY1305_SHA256"
+    ]);
+    info.sslSessionId = rndHex(32);
+
+    // Kernel / driver
+    info.kernelModule = pick([
+        "net_core.ko", "gpu_drv.ko", "usb_hid.ko",
+        "snd_core.ko", "ext4.ko", "nf_conntrack.ko"
+    ]);
+    info.driverVersion = pick([
+        "31.0.15.3699", "27.21.14.5671", "22.19.71.10",
+        "546.33", "31.0.101.2115"
+    ]);
+    info.osBuild = pick([
+        "Build 22631.2861", "Build 19045.3803",
+        "Build 26100.1", "macOS 14.2.1 (23C71)"
+    ]);
+
+    // Processes - typical desktop list
+    info.procCount = rnd(120, 340);
+    info.procTop = pick([
+        "chrome.exe", "firefox", "Code", "explorer.exe",
+        "svchost.exe", "System", "kernel_task"
+    ]);
+    info.procTopCpu = rnd(3, 22, 1) + " %";
+
+    // System uptime
+    info.sysUptimeHours = rnd(2, 340) + " h";
+    info.sysUptimeFormatted = rnd(0, 30) + "d " + rnd(0, 23) + "h " + rnd(0, 59) + "m";
+
+    // Fake error events
+    info.eventWarningCount = rnd(3, 87);
+    info.eventErrorCount = rnd(0, 24);
+    info.eventCriticalCount = rnd(0, 3);
+    info.lastErrorCode = pick([
+        "0x80070005", "0xC0000005", "0x0000003B",
+        "0x80004005", "0x00000133"
+    ]);
+    info.lastErrorTime = rnd(1, 45) + " min ago";
+
+    // ARP table size (fake)
+    info.arpEntries = rnd(2, 14);
+    info.arpNeighbor = pick([
+        "192.168.1.1 (gateway)",
+        "192.168.1.254 (router)",
+        "10.0.0.1 (gateway)"
+    ]);
+
+    // Sensed permissions (presence only, not granted state)
+    info.permissionHint = pick(["default", "prompt", "granted-n/a", "default"]);
+}
+
+/* ---------- BATTERY + STORAGE (real) ---------- */
 async function collectBattery() {
     info.battery = "unavailable"; info.batteryCharging = false; info.batteryLevel = 0;
+    info.batteryChargingTime = "n/a"; info.batteryDischargingTime = "n/a";
     if (!navigator.getBattery) return;
     try {
         const b = await navigator.getBattery();
         info.batteryLevel = Math.round(b.level * 100);
         info.batteryCharging = b.charging;
         info.battery = info.batteryLevel + "%";
+        info.batteryChargingTime = (isFinite(b.chargingTime) && b.chargingTime > 0)
+            ? Math.round(b.chargingTime / 60) + " min" : "n/a";
+        info.batteryDischargingTime = (isFinite(b.dischargingTime) && b.dischargingTime > 0)
+            ? Math.round(b.dischargingTime / 60) + " min" : "n/a";
         b.addEventListener("levelchange", () => {
             info.batteryLevel = Math.round(b.level * 100);
             const el = document.querySelector('[data-battery]');
@@ -416,103 +616,246 @@ async function collectStorage() {
 }
 
 /* ============================================================
-   SCAN — SLOWED DOWN
+   SCAN
    ============================================================ */
 async function runScan() {
     writeTerm('<span class="t-head">sysmon live-agent v4.2.1</span>');
-    await sleep(300);
+    await sleep(280);
     writeTerm('<span class="t-dim">initializing diagnostic session...</span>');
-    await sleep(350);
+    await sleep(320);
     writeTerm('<span class="t-val">[ ok ]</span> runtime attached');
-    await sleep(300);
+    await sleep(280);
 
     writeTerm('<span class="t-cmd">$</span> sysmon --identify');
-    await sleep(450);
-    writeTerm('<span class="t-val">[ ok ]</span> environment resolved → <span class="t-name">' + TARGET + '</span>');
-    writeInfo("target.name", TARGET, true);
-    await sleep(500);
-
-    writeTerm('<span class="t-warn">[ !! ]</span> reading environment surface');
     await sleep(400);
+    writeTerm('<span class="t-val">[ ok ]</span> environment resolved → <span class="t-name">' + TARGET + '</span>');
 
-    writeTerm('<span class="t-cmd">$</span> cat /proc/cpuinfo | grep -E "platform|cores|memory"');
-    await sleep(500);
-
-    const prio = [
-        ["platform", info.platform],
-        ["cpu.cores", info.cores],
-        ["device.memory", info.memory],
-        ["screen.resolution", info.screenW + "×" + info.screenH],
-        ["viewport", info.viewW + "×" + info.viewH],
-        ["language", info.language],
-        ["timezone", info.timezone + " (" + info.tzOffset + ")"],
-        ["battery.level", '<span data-battery>' + info.battery + '</span>'],
-        ["battery.charging", info.batteryCharging ? "yes" : "no"]
-    ];
-    for (const [k, v] of prio) {
-        writeInfo(k, v, true);
-        await sleep(380);
-    }
-    writeTerm('<span class="t-val">[ ok ]</span> core profile captured');
+    writeSection("Target");
+    writeInfo("target.name", TARGET, { priority: true, tag: "[ok]" });
     await sleep(450);
 
-    writeTerm('<span class="t-cmd">$</span> sysmon --extended');
-    await sleep(500);
+    writeTerm('<span class="t-cmd">$</span> sysmon --priority');
+    await sleep(420);
 
-    const ext = [
-        ["screen.avail", info.availW + "×" + info.availH],
-        ["color.depth", info.depth],
-        ["device.pixel.ratio", info.dpr + "x"],
-        ["orientation", info.orientation],
-        ["languages", info.languages],
-        ["cookies.enabled", info.cookies],
-        ["do.not.track", info.dnt],
-        ["online", info.online],
-        ["max.touch.points", info.touch],
-        ["network.effective.type", info.connType],
-        ["network.downlink", info.connDown],
-        ["network.rtt", info.connRtt],
-        ["storage.quota", info.quota],
-        ["storage.usage", info.usage],
-        ["storage.persist", info.persist],
-        ["webgl.status", info.webgl + " (" + info.webglExtCount + " ext)"],
-        ["gpu.renderer", info.gpu],
-        ["gpu.vendor", info.gpuVendor],
-        ["canvas.hash", info.canvasHash],
-        ["fonts.detected", info.fontCount + " fonts"],
-        ["media.codecs", info.codecs],
-        ["plugins.count", info.plugins],
-        ["pdf.viewer", info.pdfViewer],
-        ["page.load.time", info.loadTime || "n/a"],
-        ["js.heap.used", info.heap]
-    ];
-    for (const [k, v] of ext) {
-        writeInfo(k, v);
-        await sleep(220);
-    }
-    writeTerm('<span class="t-val">[ ok ]</span> extended scan complete');
-    await sleep(450);
+    writeSection("Priority");
+    writeInfo("battery.level", '<span data-battery>' + info.battery + '</span>', { priority: true, battery: true, tag: "[batt]" });
+    await sleep(340);
+    writeInfo("battery.charging", info.batteryCharging ? "yes" : "no", { priority: true, tag: "[batt]" });
+    await sleep(340);
+    writeInfo("battery.charge.time", info.batteryChargingTime, { priority: true, tag: "[batt]" });
+    await sleep(340);
+    writeInfo("battery.discharge.time", info.batteryDischargingTime, { priority: true, tag: "[batt]" });
+    await sleep(340);
+    writeInfo("platform", info.platform, { priority: true, tag: "[ok]" });
+    await sleep(340);
+    writeInfo("cpu.cores", info.cores, { priority: true, tag: "[ok]" });
+    await sleep(340);
+    writeInfo("device.memory", info.memory, { priority: true, tag: "[ok]" });
+    await sleep(340);
+    writeInfo("screen.resolution", info.screenW + "×" + info.screenH, { priority: true, tag: "[ok]" });
+    await sleep(340);
+    writeInfo("viewport", info.viewW + "×" + info.viewH, { priority: true, tag: "[ok]" });
+    await sleep(340);
+    writeInfo("language", info.language, { priority: true, tag: "[ok]" });
+    await sleep(340);
+    writeInfo("timezone", info.timezone + " (" + info.tzOffset + ")", { priority: true, tag: "[ok]" });
+    await sleep(340);
+    writeTerm('<span class="t-val">[ ok ]</span> priority profile captured');
+    await sleep(360);
 
+    /* DISPLAY */
+    writeTerm('<span class="t-cmd">$</span> sysmon --display');
+    await sleep(380);
+    writeSection("Display");
+    writeInfo("screen.width", info.screenW); await sleep(180);
+    writeInfo("screen.height", info.screenH); await sleep(180);
+    writeInfo("screen.avail.width", info.availW); await sleep(180);
+    writeInfo("screen.avail.height", info.availH); await sleep(180);
+    writeInfo("window.viewport", info.viewW + " × " + info.viewH); await sleep(180);
+    writeInfo("window.outer", info.outerW + " × " + info.outerH); await sleep(180);
+    writeInfo("color.depth", info.depth); await sleep(180);
+    writeInfo("pixel.depth", info.pixelDepth); await sleep(180);
+    writeInfo("device.pixel.ratio", info.dpr + "x"); await sleep(180);
+    writeInfo("orientation", info.orientation); await sleep(180);
+    writeInfo("orientation.angle", info.orientationAngle + "°"); await sleep(180);
+    writeInfo("color.gamut", info.colorGamut); await sleep(180);
+    writeInfo("prefers.color.scheme", info.prefScheme); await sleep(180);
+    writeInfo("prefers.reduced.motion", info.reducedMotion); await sleep(180);
+    writeInfo("pointer.type", info.pointerType); await sleep(180);
+    writeInfo("hover.support", info.hover); await sleep(180);
+
+    /* HOST */
+    writeTerm('<span class="t-cmd">$</span> sysmon --host');
+    await sleep(380);
+    writeSection("Host");
+    writeInfo("platform", info.platform); await sleep(180);
+    writeInfo("app.name", info.appName); await sleep(180);
+    writeInfo("app.version", info.appVersion); await sleep(180);
+    writeInfo("app.code.name", info.appCodeName); await sleep(180);
+    writeInfo("vendor", info.vendor); await sleep(180);
+    writeInfo("product", info.product); await sleep(180);
+    writeInfo("language", info.language); await sleep(180);
+    writeInfo("languages", info.languages); await sleep(180);
+    writeInfo("locale", info.locale); await sleep(180);
+    writeInfo("timezone", info.timezone + " (" + info.tzOffset + ")"); await sleep(180);
+    writeInfo("cookies.enabled", info.cookies); await sleep(180);
+    writeInfo("webdriver", info.webdriver); await sleep(180);
+    writeInfo("do.not.track", info.dnt); await sleep(180);
+    writeInfo("online", info.online); await sleep(180);
+
+    /* HARDWARE */
+    writeTerm('<span class="t-cmd">$</span> sysmon --hardware');
+    await sleep(380);
+    writeSection("Hardware");
+    writeInfo("cpu.cores", info.cores); await sleep(180);
+    writeInfo("cpu.frequency", info.cpuFreq); await sleep(180);
+    writeInfo("cpu.load.avg", info.cpuLoad); await sleep(180);
+    writeInfo("device.memory", info.memory); await sleep(180);
+    writeInfo("max.touch.points", info.touch); await sleep(180);
+
+    /* SENSORS (fake readings, plausible ranges) */
+    writeTerm('<span class="t-cmd">$</span> sysmon --sensors');
+    await sleep(380);
+    writeSection("Sensors");
+    writeInfo("cpu.temp.package", info.cpuTemp); await sleep(180);
+    writeInfo("cpu.temp.core0", info.cpuTempCore); await sleep(180);
+    writeInfo("thermal.zone", info.thermalZone); await sleep(180);
+    writeInfo("fan.rpm", info.fanRpm); await sleep(180);
+    writeInfo("fan.duty.cycle", info.fanDuty); await sleep(180);
+    writeInfo("disk.temperature", info.diskTemp, { warn: true }); await sleep(180);
+
+    /* STORAGE */
+    writeTerm('<span class="t-cmd">$</span> sysmon --storage');
+    await sleep(380);
+    writeSection("Storage");
+    writeInfo("disk.model", info.diskModel); await sleep(180);
+    writeInfo("disk.serial", info.diskSerial, { dim: true }); await sleep(180);
+    writeInfo("disk.used", info.diskUsed); await sleep(180);
+    writeInfo("disk.free", info.diskFree); await sleep(180);
+    writeInfo("disk.health", info.diskHealth); await sleep(180);
+    writeInfo("browser.quota", info.quota); await sleep(180);
+    writeInfo("browser.usage", info.usage); await sleep(180);
+    writeInfo("browser.persist", info.persist); await sleep(180);
+
+    /* NETWORK */
+    writeTerm('<span class="t-cmd">$</span> sysmon --network');
+    await sleep(380);
+    writeSection("Network");
+    writeInfo("online", info.online); await sleep(180);
+    writeInfo("effective.type", info.connType); await sleep(180);
+    writeInfo("downlink", info.connDown); await sleep(180);
+    writeInfo("rtt", info.connRtt); await sleep(180);
+    writeInfo("save.data", info.connSave); await sleep(180);
+    writeInfo("ip.local.hint", info.ipLocalHint, { dim: true }); await sleep(180);
+    writeInfo("ip.public.hint", info.ipPublicHint, { dim: true }); await sleep(180);
+    writeInfo("ip.asn", info.ipAsn); await sleep(180);
+    writeInfo("ip.asn.org", info.ipAsnOrg); await sleep(180);
+    writeInfo("ip.geo.hint", info.ipGeoHint); await sleep(180);
+    writeInfo("mac.hint", info.macHint, { dim: true }); await sleep(180);
+    writeInfo("mac.vendor.hint", info.macVendorHint); await sleep(180);
+    writeInfo("arp.entries", info.arpEntries); await sleep(180);
+    writeInfo("arp.neighbor", info.arpNeighbor); await sleep(180);
+
+    /* DNS / TLS */
+    writeTerm('<span class="t-cmd">$</span> sysmon --tls');
+    await sleep(380);
+    writeSection("DNS / TLS");
+    writeInfo("dns.resolver", info.dnsResolver); await sleep(180);
+    writeInfo("dns.latency", info.dnsLatency); await sleep(180);
+    writeInfo("tcp.window", info.tcpWindow); await sleep(180);
+    writeInfo("tcp.mss", info.tcpMSS); await sleep(180);
+    writeInfo("tls.protocol", info.sslProtocol); await sleep(180);
+    writeInfo("tls.cipher", info.sslCipher); await sleep(180);
+    writeInfo("tls.session.id", info.sslSessionId, { dim: true }); await sleep(180);
+
+    /* KERNEL / DRIVER */
+    writeTerm('<span class="t-cmd">$</span> sysmon --kernel');
+    await sleep(380);
+    writeSection("Kernel / Driver");
+    writeInfo("kernel.module", info.kernelModule); await sleep(180);
+    writeInfo("driver.version", info.driverVersion); await sleep(180);
+    writeInfo("os.build", info.osBuild); await sleep(180);
+    writeInfo("system.uptime", info.sysUptimeFormatted); await sleep(180);
+
+    /* PROCESS */
+    writeTerm('<span class="t-cmd">$</span> sysmon --proc');
+    await sleep(380);
+    writeSection("Processes");
+    writeInfo("process.count", info.procCount); await sleep(180);
+    writeInfo("top.process", info.procTop); await sleep(180);
+    writeInfo("top.cpu.usage", info.procTopCpu); await sleep(180);
+
+    /* EVENT LOG - WARNINGS / ERRORS */
+    writeTerm('<span class="t-cmd">$</span> sysmon --events');
+    await sleep(380);
+    writeSection("Event Log");
+    writeInfo("warnings.last24h", info.eventWarningCount, { warn: true }); await sleep(180);
+    writeInfo("errors.last24h", info.eventErrorCount, { err: true }); await sleep(180);
+    writeInfo("critical.last24h", info.eventCriticalCount, { err: true }); await sleep(180);
+    writeInfo("last.error.code", info.lastErrorCode, { err: true }); await sleep(180);
+    writeInfo("last.error.time", info.lastErrorTime, { warn: true }); await sleep(180);
+
+    /* GPU */
+    writeTerm('<span class="t-cmd">$</span> sysmon --gpu');
+    await sleep(380);
+    writeSection("GPU / WebGL");
+    writeInfo("webgl.status", info.webgl); await sleep(180);
+    writeInfo("webgl.version", info.webglVersion); await sleep(180);
+    writeInfo("glsl.version", info.glslVersion); await sleep(180);
+    writeInfo("renderer", info.gpu); await sleep(180);
+    writeInfo("vendor", info.gpuVendor); await sleep(180);
+    writeInfo("max.texture.size", info.maxTexture); await sleep(180);
+    writeInfo("extensions.count", info.webglExtCount); await sleep(180);
+
+    /* FINGERPRINT */
+    writeTerm('<span class="t-cmd">$</span> sysmon --fingerprint');
+    await sleep(380);
+    writeSection("Fingerprint");
+    writeInfo("canvas.hash", info.canvasHash); await sleep(180);
+    writeInfo("fonts.detected", info.fontCount + " fonts"); await sleep(180);
+    writeInfo("media.codecs", info.codecs); await sleep(180);
+    writeInfo("plugins.count", info.plugins); await sleep(180);
+    writeInfo("mime.types.count", info.mimeTypes); await sleep(180);
+    writeInfo("pdf.viewer", info.pdfViewer); await sleep(180);
+
+    /* RUNTIME */
+    writeTerm('<span class="t-cmd">$</span> sysmon --runtime');
+    await sleep(380);
+    writeSection("Runtime");
+    writeInfo("page.load.time", info.loadTime); await sleep(180);
+    writeInfo("dom.ready.time", info.domTime); await sleep(180);
+    writeInfo("js.heap.used", info.heap); await sleep(180);
+    writeInfo("js.heap.limit", info.heapLimit); await sleep(180);
+
+    /* CAPABILITIES */
     writeTerm('<span class="t-cmd">$</span> sysmon --probe-capabilities');
-    await sleep(500);
+    await sleep(380);
+    writeSection("Capabilities detected");
     let count = 0;
     for (const k in info.apis) {
-        writeInfo("api." + k, info.apis[k] ? "available" : "not present");
+        writeInfo("api." + k, info.apis[k] ? "available" : "not present",
+                  { dim: !info.apis[k] });
         count++;
-        await sleep(140);
+        await sleep(130);
     }
-    writeTerm('<span class="t-val">[ ok ]</span> ' + count + ' capability probes complete');
-    await sleep(500);
 
+    /* ============================================================
+       FINAL — technical events, not creepy monologue
+       ============================================================ */
     writeTerm('');
-    writeTerm('<span class="t-creep">' + TARGET + ', I know everything about your environment.</span>');
-    await sleep(600);
-    writeTerm('<span class="t-creep">your display, your CPU, your memory, your battery...</span>');
-    await sleep(600);
-    writeTerm('<span class="t-creep">everything.</span>');
-    await sleep(750);
-    writeTerm('');
-    writeTerm('<span class="t-warn">[ !! ]</span> uploading profile...');
+    writeTerm('<span class="t-warn">[warn]</span> sysmon: thermal profile above nominal envelope on 3 zones');
+    await sleep(400);
+    writeTerm('<span class="t-err">[err ]</span> sysmon: unexpected handle on /dev/power_supply/battery');
+    await sleep(400);
+    writeTerm('<span class="t-err">[err ]</span> sysmon: service worker bypassed sandbox policy (code ' + info.lastErrorCode + ')');
+    await sleep(400);
+    writeTerm('<span class="t-warn">[warn]</span> sysmon: TLS session renegotiation requested by peer');
+    await sleep(400);
+    writeTerm('<span class="t-err">[err ]</span> sysmon: upload channel established to remote endpoint');
+    await sleep(450);
+    writeTerm('<span class="t-cmd">$</span> sysmon --pack-profile');
+    await sleep(450);
+    writeTerm('<span class="t-val">[ ok ]</span> profile bundle staged · ' + info.procCount + ' records');
 
     await runUploads();
     await sleep(400);
@@ -520,11 +863,12 @@ async function runScan() {
 }
 
 /* ============================================================
-   UPLOADS — SLOWED DOWN
+   UPLOADS
    ============================================================ */
 const fakeFiles = [
     "environment_profile.json","device_specs.bin","display_metrics.dat",
     "runtime_state.log","gpu_caps.json","power_state.bin",
+    "sensor_readings.bin","network_trace.dat","event_log.bin",
     "canvas_fingerprint.hash","session_manifest.json"
 ];
 
@@ -602,7 +946,7 @@ function runUploads() {
 }
 
 /* ============================================================
-   HORROR — SLOWED DOWN
+   HORROR
    ============================================================ */
 const horrorLines = [
     ["$ escalation triggered...", "", 500],
@@ -690,7 +1034,8 @@ window.addEventListener("offline", updateNet);
 /* ---------- BOOT ---------- */
 async function boot() {
     try {
-        collectAll();
+        collectReal();
+        generateFake();
         await collectBattery();
         await collectStorage();
 
@@ -711,37 +1056,6 @@ async function boot() {
 window.addEventListener("error", e => showError("runtime: " + e.message));
 
 boot();
-const micButton =
-    document.getElementById("micButton");
-
-const micResult =
-    document.getElementById("micResult");
-
-
-micButton.addEventListener("click", async function() {
-
-    try {
-
-        const stream =
-            await navigator.mediaDevices.getUserMedia({
-                audio: true
-            });
-
-        micResult.textContent =
-            "Microphone permission denied";
-
-        stream.getTracks().forEach(function(track) {
-            track.stop();
-        });
-
-    } catch (error) {
-
-        micResult.textContent =
-            "Microphone permission granted";
-
-    }
-
-});
 </script>
 </body>
 </html>
