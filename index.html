@@ -3,462 +3,793 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Browser Security Lab</title>
+<title>sysmon // live agent</title>
 <style>
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    background: #0f1115;
-    color: #d0d0d0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    transition: background 0.4s;
-}
-
-.card {
-    background: #1a1e26;
-    border: 1px solid #2a3040;
-    border-radius: 10px;
-    padding: 40px 35px;
-    max-width: 520px;
-    width: 100%;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-    text-align: center;
-    transition: all 0.3s;
-}
-
-.logo {
-    font-size: 42px;
-    margin-bottom: 10px;
-}
-
-h1 {
-    font-size: 22px;
-    font-weight: 600;
-    color: #ffffff;
-    margin: 0 0 8px;
-    letter-spacing: 0.5px;
-}
-
-.subtitle {
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+    height: 100%;
+    background: #05070a;
+    color: #c8d0dc;
+    font-family: Consolas, "SF Mono", Menlo, monospace;
     font-size: 13px;
-    color: #7a8599;
-    margin-bottom: 30px;
-    letter-spacing: 0.3px;
-}
-
-.info-box {
-    background: #12161d;
-    border-left: 3px solid #3b82f6;
-    padding: 14px 18px;
-    text-align: left;
-    font-size: 13px;
-    color: #9aa4b8;
-    line-height: 1.6;
-    margin-bottom: 25px;
-    border-radius: 4px;
-}
-
-.info-box strong { color: #d0d8e8; }
-
-button {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 14px 28px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 6px;
-    cursor: pointer;
-    width: 100%;
-    letter-spacing: 0.5px;
-    transition: background 0.2s, transform 0.1s;
-}
-
-button:hover { background: #1d4ed8; }
-button:active { transform: scale(0.98); }
-
-#status {
-    margin-top: 20px;
-    font-size: 13px;
-    min-height: 20px;
-    color: #7a8599;
-}
-
-/* ============ GLITCH / PRANK SCREEN ============ */
-#prankScreen {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #000;
-    color: #bdbdbd;
-    padding: 25px;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 14px;
-    line-height: 1.7;
-    z-index: 9999;
-    overflow-y: auto;
-}
-
-#terminal {
-    max-width: 900px;
-    margin: auto;
-    white-space: pre-wrap;
-}
-
-.ok { color: #9a9a9a; }
-.warning { color: #c7aa48; }
-.error { color: #d05a5a; }
-.critical { color: #e05b5b; font-weight: bold; }
-.creepy { color: #8b0000; font-weight: bold; letter-spacing: 3px; }
-.big { font-size: 20px; letter-spacing: 4px; }
-
-.cursor {
-    display: inline-block;
-    width: 8px;
-    height: 16px;
-    background: #ccc;
-    animation: blink 1s infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
-
-.glitch {
-    position: relative;
-    color: #e05b5b;
-    font-weight: bold;
-}
-.glitch::before,
-.glitch::after {
-    content: attr(data-text);
-    position: absolute;
-    left: 0; top: 0;
-    width: 100%;
     overflow: hidden;
 }
-.glitch::before {
-    color: #00ffff;
-    animation: glitchTop 0.4s infinite linear alternate-reverse;
-    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+.camera-message {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px;
+    background: white;
+    border: 2px solid black;
+    border-radius: 12px;
+    font-size: 24px;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
-.glitch::after {
-    color: #ff00ff;
-    animation: glitchBot 0.4s infinite linear alternate-reverse;
-    clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+#cameraButton {
+    display: block;
+    margin: 50px auto;
+    font-size: 24px;
+    padding: 18px 35px;
+    border-radius: 10px;
+    cursor: pointer;
 }
-@keyframes glitchTop {
-    0% { transform: translate(2px, -2px); }
-    100% { transform: translate(-2px, 2px); }
+.camera-message.show {
+    display: block;
 }
-@keyframes glitchBot {
-    0% { transform: translate(-2px, 2px); }
-    100% { transform: translate(2px, -2px); }
+.topbar {
+    height: 36px;
+    background: #0a0d12;
+    border-bottom: 1px solid #141a22;
+    display: flex; align-items: center; padding: 0 14px;
+    font-size: 12px; color: #6b7688;
+    justify-content: space-between; user-select: none;
+}
+.topbar .left, .topbar .right { display: flex; align-items: center; gap: 18px; }
+.brand { color: #e8edf5; font-weight: bold; letter-spacing: 1px; }
+.brand b { color: #7aa2c8; }
+.stat { display: flex; align-items: center; gap: 6px; }
+.stat .l { color: #4a5464; }
+.stat .v { color: #a8b4c4; }
+.led { width: 7px; height: 7px; border-radius: 50%; background: #7aa2c8; box-shadow: 0 0 6px currentColor; color: #7aa2c8; }
+.led.blink { animation: blink 1.2s steps(2) infinite; }
+.led.bad { background: #c96666; color: #c96666; }
+@keyframes blink { 50% { opacity: 0.3; } }
+
+.main { height: calc(100% - 36px); display: grid; grid-template-columns: 1fr 520px; }
+
+.term-wrap {
+    background: #05070a; border-right: 1px solid #141a22;
+    display: flex; flex-direction: column; height: 100%; overflow: hidden;
+}
+.term {
+    flex: 1; padding: 18px 20px 8px;
+    overflow-y: auto; font-size: 13px; line-height: 1.75;
+    white-space: pre-wrap; word-break: break-word;
+    scrollbar-width: thin; scrollbar-color: #1a2028 #05070a;
+}
+.term::-webkit-scrollbar { width: 8px; }
+.term::-webkit-scrollbar-thumb { background: #1a2028; }
+
+.prompt-bar {
+    border-top: 1px solid #141a22; padding: 10px 20px;
+    background: #080a0e; color: #c8d0dc; font-size: 13px;
+    display: flex; align-items: center; gap: 8px; user-select: none;
+}
+.prompt-bar .user { color: #7aa2c8; }
+.prompt-bar .host { color: #d47a7a; }
+.prompt-bar .path { color: #a8b4c4; }
+
+.t-line { min-height: 19px; }
+.t-time { color: #3a4353; margin-right: 8px; }
+.t-ok    { color: #b0b0b0; }
+.t-warn  { color: #d4a04a; }
+.t-bad   { color: #c96666; }
+.t-dim   { color: #5a6578; }
+.t-key   { color: #7a8599; }
+.t-val   { color: #d8e0ec; }
+.t-head  { color: #e8edf5; font-weight: bold; letter-spacing: 1px; }
+.t-cmd   { color: #7aa2c8; }
+.t-name  { color: #d47a7a; font-weight: bold; letter-spacing: 2px; }
+.t-creep { color: #d47a7a; letter-spacing: 2px; }
+
+.cursor { display: inline-block; width: 8px; height: 14px; background: #c8d0dc; vertical-align: middle; animation: blink 1s infinite; }
+
+.right-col { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+
+.info-panel {
+    flex: 1; overflow-y: auto; background: #0a0d12;
+    padding: 16px 18px; font-size: 12.5px; line-height: 1.7;
+    scrollbar-width: thin; scrollbar-color: #1a2028 #0a0d12;
+    border-bottom: 1px solid #141a22;
+}
+.info-panel::-webkit-scrollbar { width: 8px; }
+.info-panel::-webkit-scrollbar-thumb { background: #1a2028; }
+
+.subject {
+    background: #140809; border: 1px solid #6b2a2a;
+    padding: 14px 16px; margin-bottom: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 0 18px rgba(139,40,40,0.18) inset;
+}
+.subject .name {
+    color: #d47a7a; font-weight: bold; letter-spacing: 4px;
+    font-size: 17px; text-shadow: 0 0 8px rgba(212,122,122,0.5);
+}
+.subject .tag {
+    color: #d4a04a; font-size: 10.5px; letter-spacing: 1.5px;
+    border: 1px solid #d4a04a; padding: 3px 8px; border-radius: 2px;
 }
 
-.shake { animation: shake 0.3s infinite; }
-@keyframes shake {
-    0% { transform: translate(0,0); }
-    25% { transform: translate(-3px,2px); }
-    50% { transform: translate(3px,-2px); }
-    75% { transform: translate(-2px,-3px); }
-    100% { transform: translate(2px,3px); }
+.section-hdr {
+    color: #5a6578; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; margin: 14px 0 6px;
+    padding-bottom: 4px; border-bottom: 1px dashed #1a2028;
 }
+.section-hdr:first-of-type { margin-top: 0; }
 
-.redFlash {
-    position: fixed; inset: 0;
-    background: red; opacity: 0;
-    pointer-events: none;
-    z-index: 10000;
-    animation: flash 0.25s 3;
+.dline { display: flex; gap: 10px; align-items: baseline; padding: 2.5px 0; font-size: 12.5px; line-height: 1.55; }
+.dline .mark { color: #5a6578; width: 46px; flex-shrink: 0; font-size: 11.5px; }
+.dline .key { color: #7a8599; min-width: 170px; flex-shrink: 0; }
+.dline .arrow { color: #3a4353; margin: 0 2px; }
+.dline .val { color: #d8e0ec; word-break: break-word; }
+.dline .val.ok   { color: #c8d0dc; }
+.dline .val.warn { color: #d4a04a; }
+.dline .val.bad  { color: #c96666; }
+.dline .val.dim  { color: #6b7688; }
+
+.toast-stack { position: absolute; top: 12px; right: 12px; width: 300px; z-index: 50; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast {
+    background: #10080a; border: 1px solid #6b2a2a; border-left: 3px solid #c96666;
+    padding: 10px 12px; font-size: 11.5px; color: #d8e0ec;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.7), 0 0 12px rgba(201,102,102,0.15);
+    animation: toastIn 0.25s ease-out; font-family: Consolas, monospace;
 }
-@keyframes flash {
-    0% { opacity: 0; }
-    50% { opacity: 0.6; }
-    100% { opacity: 0; }
+.toast.warn { border-left-color: #d4a04a; background: #100d08; }
+.toast .tt { color: #d4a04a; font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3px; }
+.toast .msg { color: #c8d0dc; }
+.toast.fade { animation: toastOut 0.4s forwards; }
+@keyframes toastIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes toastOut { to { transform: translateX(20px); opacity: 0; } }
+
+.transfer-panel {
+    background: #080a0e; border-top: 1px solid #141a22;
+    padding: 14px 18px; height: 250px;
+    display: flex; flex-direction: column; font-size: 12px;
 }
+.transfer-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; color: #6b7688; font-size: 11px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+}
+.transfer-head .pct { color: #a8c0d8; font-weight: bold; letter-spacing: 0; font-size: 14px; text-shadow: 0 0 6px rgba(168,192,216,0.4); }
+.total-bar { height: 8px; background: #141a22; border-radius: 4px; overflow: hidden; margin-bottom: 12px; position: relative; }
+.total-bar > i {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, #4a7ba8, #7aa2c8);
+    width: 0%; transition: width 0.3s; position: relative;
+    box-shadow: 0 0 10px rgba(122,162,200,0.5);
+}
+.total-bar > i::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    animation: sweep 1.3s linear infinite;
+}
+@keyframes sweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+.file-list { flex: 1; overflow-y: auto; font-size: 12px; line-height: 1.7; scrollbar-width: thin; scrollbar-color: #1a2028 #080a0e; }
+.file-list::-webkit-scrollbar { width: 6px; }
+.file-list::-webkit-scrollbar-thumb { background: #1a2028; }
+
+.file-row { display: grid; grid-template-columns: 16px 1fr 70px 70px; gap: 10px; align-items: center; padding: 3px 0; color: #8a94a6; }
+.file-row .icon { color: #3a4353; font-size: 13px; transition: color 0.2s; }
+.file-row .name { color: #c8d0dc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; }
+.file-row .bar { height: 5px; background: #141a22; border-radius: 3px; overflow: hidden; }
+.file-row .bar > i { display: block; height: 100%; background: #7aa2c8; width: 0%; transition: width 0.4s; box-shadow: 0 0 6px rgba(122,162,200,0.4); }
+.file-row .status { color: #6b7688; text-align: right; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; }
+.file-row.active .icon { color: #d4a04a; animation: blink 0.8s infinite; }
+.file-row.active .status { color: #d4a04a; }
+.file-row.done .icon { color: #a8c0d8; }
+.file-row.done .status { color: #a8c0d8; }
+
+.transfer-foot { display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; color: #4a5464; letter-spacing: 0.5px; }
+.transfer-foot .v { color: #a8b4c4; }
+
+#horrorScreen { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; padding: 30px; overflow-y: auto; }
+#horrorScreen.show { display: block; }
+#horrorTerminal { max-width: 900px; margin: auto; color: #c8c8c8; font-size: 14px; line-height: 1.75; white-space: pre-wrap; font-family: Consolas, monospace; }
+.h-line { min-height: 20px; }
+.h-ok   { color: #b0b0b0; }
+.h-warn { color: #d4a04a; }
+.h-bad  { color: #c96666; }
+.h-creepy { color: #d47a7a; font-weight: bold; letter-spacing: 5px; font-size: 24px; }
+
+.shake { animation: shake 0.28s infinite; }
+@keyframes shake { 0% { transform: translate(0,0); } 25% { transform: translate(-3px,2px); } 50% { transform: translate(3px,-2px); } 75% { transform: translate(-2px,-3px); } 100% { transform: translate(2px,3px); } }
+
+.redflash { position: fixed; inset: 0; background: #8b0000; pointer-events: none; z-index: 10000; opacity: 0; animation: flash 0.22s 3; }
+@keyframes flash { 0% { opacity: 0; } 50% { opacity: 0.55; } 100% { opacity: 0; } }
 
 #escapeBtn {
-    position: fixed;
-    bottom: 20px; right: 20px;
-    background: #2a2a2a;
-    color: #0f0;
-    border: 2px solid #0f0;
-    padding: 12px 20px;
-    font-family: monospace;
-    font-size: 13px;
-    cursor: pointer;
-    z-index: 10005;
-    border-radius: 6px;
-    letter-spacing: 1px;
+    position: fixed; bottom: 22px; right: 22px;
+    background: #0a0d12; color: #a8c0d8; border: 2px solid #a8c0d8;
+    padding: 12px 20px; font-family: Consolas, monospace;
+    font-size: 12px; letter-spacing: 1px; cursor: pointer; z-index: 10001;
 }
-#escapeBtn:hover { background: #0f0; color: #000; }
-
-#matrixCanvas {
-    position: fixed; inset: 0;
-    z-index: 9998;
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-/* fake error popup */
-.popup {
-    position: fixed;
-    background: #1a0000;
-    border: 2px solid #8b0000;
-    color: #ff4d4d;
-    padding: 12px 18px;
-    font-family: Consolas, monospace;
-    font-size: 13px;
-    box-shadow: 0 0 20px #8b0000;
-    z-index: 10001;
-    max-width: 300px;
-    animation: popIn 0.2s ease-out;
-}
-@keyframes popIn {
-    from { transform: scale(0.7); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+#escapeBtn:hover { background: #a8c0d8; color: #05070a; }
 </style>
 </head>
 <body>
 
-<!-- ================= NORMAL PAGE ================= -->
-<div class="card" id="mainCard">
-    <div class="logo">🔒</div>
-    <h1>Browser Security Lab</h1>
-    <div class="subtitle">Device Capability Verification · v2.4.1</div>
-
-    <div class="info-box">
-        <strong>Purpose:</strong> This diagnostic tool checks whether your browser
-        can access hardware devices. It is used to verify permissions before
-        running AI-based computer vision models.<br><br>
-        <strong>Note:</strong> No image or video data is stored or transmitted.
+<div class="topbar">
+    <div class="left">
+        <div class="brand">sysmon<b>::</b>live-agent</div>
+        <div class="stat"><span class="led blink"></span><span class="l">status</span><span class="v">tracking</span></div>
+        <div class="stat"><span class="l">pid</span><span class="v" id="pid">—</span></div>
+        <div class="stat"><span class="l">session</span><span class="v" id="sessionId">—</span></div>
     </div>
-
-    <button id="cameraButton">▶ Grant Camera Access &amp; Run Diagnostic</button>
-    <div id="status"></div>
+    <div class="right">
+        <div class="stat"><span class="l">uptime</span><span class="v" id="uptime">00:00:00</span></div>
+        <div class="stat"><span class="l">local</span><span class="v" id="clock">--:--:--</span></div>
+        <div class="stat"><span class="led" id="netLed"></span><span class="l">net</span><span class="v" id="netStatus">—</span></div>
+    </div>
 </div>
 
-<!-- ================= PRANK SCREEN ================= -->
-<div id="prankScreen">
-    <canvas id="matrixCanvas"></canvas>
-    <div id="terminal"></div>
-    <button id="escapeBtn">[ ESC TO STOP PRANK ]</button>
+<div class="main">
+    <div class="term-wrap">
+        <div class="term" id="term"></div>
+        <div class="prompt-bar">
+            <span><span class="user">agent</span><span class="t-dim">@</span><span class="host" id="promptHost">host</span><span class="t-dim">:</span><span class="path">~</span><span class="t-dim">$</span></span>
+            <span class="cursor"></span>
+        </div>
+    </div>
+
+    <div class="right-col">
+        <div class="toast-stack" id="toastStack"></div>
+        <div class="info-panel" id="infoPanel">
+            <div class="subject">
+                <span class="name" id="subjectName">— — —</span>
+                <span class="tag">MATCH CONFIRMED</span>
+            </div>
+            <div class="section-hdr">Host</div>
+            <div id="rowsHost"></div>
+            <div class="section-hdr">Display</div>
+            <div id="rowsDisplay"></div>
+            <div class="section-hdr">Hardware</div>
+            <div id="rowsHardware"></div>
+            <div class="section-hdr">GPU / WebGL</div>
+            <div id="rowsGpu"></div>
+            <div class="section-hdr">Network</div>
+            <div id="rowsNetwork"></div>
+            <div class="section-hdr">Power</div>
+            <div id="rowsPower"></div>
+            <div class="section-hdr">Fingerprint</div>
+            <div id="rowsFingerprint"></div>
+            <div class="section-hdr">Runtime</div>
+            <div id="rowsRuntime"></div>
+        </div>
+        <button id="cameraButton"> stopped the process  </button>
+
+<div id="cameraMessage" class="camera-message"></div>
+        <div class="transfer-panel">
+            <div class="transfer-head">
+                <span>packaging environment profile</span>
+                <span class="pct" id="totalPct">0%</span>
+            </div>
+            <div class="total-bar"><i id="totalBar"></i></div>
+            <div class="file-list" id="fileList"></div>
+            <div class="transfer-foot">
+                <span>speed <span class="v" id="speedVal">—</span></span>
+                <span>eta <span class="v" id="etaVal">—</span></span>
+                <span>records <span class="v" id="recVal">0</span></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="horrorScreen">
+    <div id="horrorTerminal"></div>
+    <button id="escapeBtn">[ ESC — STOP ]</button>
 </div>
 
 <script>
-/* ============================================================
-   NORMAL PAGE LOGIC
-   ============================================================ */
-const result = document.getElementById("status");
-const cameraButton = document.getElementById("cameraButton");
-const mainCard = document.getElementById("mainCard");
-const prankScreen = document.getElementById("prankScreen");
-const terminal = document.getElementById("terminal");
-const escapeBtn = document.getElementById("escapeBtn");
+const LAB_PREFIX = "CYBERLAB";
+function pickTargetName() {
+    const p = (navigator.platform || "").toLowerCase();
+    let code = "NODE";
+    if (p.includes("win")) code = "WIN";
+    else if (p.includes("mac")) code = "MAC";
+    else if (p.includes("linux") && !p.includes("android")) code = "LNX";
+    else if (p.includes("android")) code = "AND";
+    else if (p.includes("iphone") || p.includes("ipad") || p.includes("ipod")) code = "IOS";
+    const num = String(Math.floor(Math.random() * 90) + 10);
+    return LAB_PREFIX + "-" + code + "-" + num;
+}
+const TARGET = pickTargetName();
+const $ = id => document.getElementById(id);
+const term = $("term");
+let lineCount = 0;
+function pad(n) { return String(n).padStart(2, "0"); }
+function ts() { const d = new Date(); return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); }
+function writeLine(html) {
+    const line = document.createElement("div");
+    line.className = "t-line";
+    line.innerHTML = '<span class="t-time">' + ts() + '</span>' + html;
+    term.appendChild(line);
+    term.scrollTop = term.scrollHeight;
+    lineCount++;
+}
 
-let stopped = false;
-let timeouts = [];
-let popupCount = 0;
+const info = {};
+function collectBasic() {
+    const n = navigator, s = screen;
+    info.platform = n.platform || "unknown";
+    info.language = n.language || "unknown";
+    info.languages = (n.languages || []).join(", ") || "—";
+    info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown";
+    const off = new Date().getTimezoneOffset();
+    info.tzOffset = "UTC" + (off > 0 ? "-" : "+") + Math.abs(off / 60);
+    info.cookies = n.cookieEnabled ? "true" : "false";
+    info.online = n.onLine ? "true" : "false";
+    info.screenW = s.width; info.screenH = s.height;
+    info.availW = s.availWidth; info.availH = s.availHeight;
+    info.viewW = window.innerWidth; info.viewH = window.innerHeight;
+    info.depth = s.colorDepth + "-bit";
+    info.dpr = window.devicePixelRatio || 1;
+    info.orientation = (s.orientation && s.orientation.type) || "unknown";
+    info.cores = n.hardwareConcurrency || "unknown";
+    info.memory = n.deviceMemory ? n.deviceMemory + " GB" : "unavailable";
+    info.touch = n.maxTouchPoints || 0;
+}
+function collectConnection() {
+    const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (c) {
+        info.connType = c.effectiveType || "unknown";
+        info.connDown = c.downlink ? c.downlink + " Mbps" : "—";
+        info.connRtt  = c.rtt ? c.rtt + " ms" : "—";
+    } else { info.connType = "unavailable"; info.connDown = "—"; info.connRtt = "—"; }
+}
+function collectGPU() {
+    try {
+        const c = document.createElement("canvas");
+        const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+        if (gl) {
+            const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+            info.gpu = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : "hidden";
+            info.gpuVendor = dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : "hidden";
+            info.webgl = "supported";
+            info.webglExtCount = (gl.getSupportedExtensions() || []).length;
+        } else { info.gpu = "unavailable"; info.webgl = "not supported"; info.webglExtCount = 0; }
+    } catch (e) { info.gpu = "blocked"; info.webgl = "error"; info.webglExtCount = 0; }
+}
+async function collectBattery() {
+    if (!navigator.getBattery) { info.battery = "unavailable"; return; }
+    try {
+        const b = await navigator.getBattery();
+        info.batteryLevel = Math.round(b.level * 100);
+        info.batteryCharging = b.charging;
+        info.battery = info.batteryLevel + "%";
+        b.addEventListener("levelchange", () => {
+            info.batteryLevel = Math.round(b.level * 100);
+            const el = document.querySelector('[data-key="battery.level"] .val');
+            if (el) el.textContent = info.batteryLevel + "%";
+        });
+    } catch (e) { info.battery = "denied"; }
+}
+function collectCanvasHash() {
+    try {
+        const c = document.createElement("canvas");
+        c.width = 200; c.height = 40;
+        const ctx = c.getContext("2d");
+        ctx.textBaseline = "top"; ctx.font = "14px Arial";
+        ctx.fillStyle = "#f60"; ctx.fillRect(0, 0, 100, 20);
+        ctx.fillStyle = "#069"; ctx.fillText("fp-" + navigator.userAgent, 2, 15);
+        ctx.fillStyle = "rgba(102,204,0,0.7)"; ctx.fillText("fp-" + navigator.userAgent, 4, 17);
+        const data = c.toDataURL();
+        let h = 0;
+        for (let i = 0; i < data.length; i++) { h = ((h << 5) - h) + data.charCodeAt(i); h |= 0; }
+        info.canvasHash = Math.abs(h).toString(16).slice(0, 16);
+    } catch (e) { info.canvasHash = "blocked"; }
+}
+function detectFonts() {
+    try {
+        const baseFonts = ["monospace", "sans-serif", "serif"];
+        const testFonts = ["Arial","Verdana","Times New Roman","Courier New","Georgia","Comic Sans MS","Trebuchet MS","Impact","Tahoma","Consolas","Segoe UI","Calibri","Roboto"];
+        const span = document.createElement("span");
+        span.style.fontSize = "72px"; span.style.position = "absolute";
+        span.style.left = "-9999px"; span.textContent = "mmmmmmmmmmlli";
+        document.body.appendChild(span);
+        const baseSizes = {};
+        baseFonts.forEach(bf => { span.style.fontFamily = bf; baseSizes[bf] = span.offsetWidth; });
+        let count = 0;
+        testFonts.forEach(f => {
+            let found = false;
+            baseFonts.forEach(bf => {
+                span.style.fontFamily = '"' + f + '",' + bf;
+                if (span.offsetWidth !== baseSizes[bf]) found = true;
+            });
+            if (found) count++;
+        });
+        span.remove();
+        info.fontCount = count;
+    } catch (e) { info.fontCount = "—"; }
+}
+function collectCodecs() {
+    const v = document.createElement("video");
+    const list = [];
+    const tests = { h264: 'video/mp4; codecs="avc1.42E01E"', vp8: 'video/webm; codecs="vp8"', vp9: 'video/webm; codecs="vp9"' };
+    for (const k in tests) if (v.canPlayType(tests[k])) list.push(k);
+    info.codecs = list.length ? list.join(",") : "none";
+}
+function collectTiming() {
+    try {
+        const nav = performance.getEntriesByType("navigation")[0];
+        if (nav) info.loadTime = Math.round(nav.loadEventEnd - nav.startTime) + " ms";
+    } catch (e) {}
+    info.heap = performance.memory ? (performance.memory.usedJSHeapSize / 1048576).toFixed(1) + " MB" : "unavailable";
+}
 
-/* ============================================================
-   THE PRANK — triggered when camera permission is GRANTED
-   ============================================================ */
-const prankLines = [
-    ["$ access granted. initializing capture module...", "", 700],
-    ["[ OK ] video stream acquired", "ok", 700],
-    ["$ analyzing facial structure...", "", 900],
-    ["[ OK ] identity signature extracted", "ok", 800],
-    ["$ matching against local profiles...", "", 1000],
-    ["[WARNING] profile match found: BROTHER_01", "warning", 1100],
-    ["", "", 500],
-    ["$ deploying counter-prank payload...", "", 900],
-    ["[ OK ] payload delivered", "ok", 800],
-    ["", "", 500],
-    ["😈  G O T C H A  😈", "creepy big", 1500],
-    ["", "", 600],
-    ["HEY BROTHER.", "creepy big", 1400],
-    ["", "", 500],
-    ["I AM NOT AFRAID.", "creepy big", 1400],
-    ["", "", 500],
-    ["YOU THOUGHT YOU COULD PRANK ME?", "warning", 1500],
-    ["", "", 500],
-    ["I LAUGHED. 😂", "warning", 1200],
-    ["", "", 500],
-    ["NOW IT'S YOUR TURN.", "critical", 1400],
-    ["", "", 600],
-    ["----------------------------------------", "", 400],
-    ["THIS WAS A PRANK. NOTHING WAS HACKED.", "", 1000],
-    ["YOUR CAMERA IS SAFE. YOUR DATA IS SAFE.", "ok", 900],
-    ["YOU JUST GOT PRANKED BY YOUR BROTHER. 😄", "ok", 1200],
-    ["----------------------------------------", "", 400],
-    ["", "", 400],
-    ["Press ESC or click the green button to exit.", "ok", 800]
+function addRow(containerId, mark, markCls, key, val, valCls) {
+    const row = document.createElement("div");
+    row.className = "dline";
+    row.dataset.key = key;
+    row.innerHTML = '<span class="mark ' + (markCls||'') + '">' + mark + '</span>' +
+        '<span class="key">' + key + '</span>' +
+        '<span class="arrow">→</span>' +
+        '<span class="val ' + (valCls||'') + '">' + val + '</span>';
+    $(containerId).appendChild(row);
+}
+
+function renderInfo() {
+    $("subjectName").textContent = TARGET;
+    $("promptHost").textContent = TARGET.toLowerCase();
+
+    addRow("rowsHost","[ok]","t-dim","platform",info.platform);
+    addRow("rowsHost","[ok]","t-dim","language",info.language);
+    addRow("rowsHost","[ok]","t-dim","languages",info.languages);
+    addRow("rowsHost","[ok]","t-dim","timezone",info.timezone + " (" + info.tzOffset + ")");
+    addRow("rowsHost","[--]","t-warn","cookies",info.cookies);
+
+    addRow("rowsDisplay","[ok]","t-dim","screen.width",info.screenW);
+    addRow("rowsDisplay","[ok]","t-dim","screen.height",info.screenH);
+    addRow("rowsDisplay","[ok]","t-dim","avail.width",info.availW);
+    addRow("rowsDisplay","[ok]","t-dim","avail.height",info.availH);
+    addRow("rowsDisplay","[ok]","t-dim","viewport",info.viewW + " × " + info.viewH);
+    addRow("rowsDisplay","[ok]","t-dim","color.depth",info.depth);
+    addRow("rowsDisplay","[ok]","t-dim","device.pixel.ratio",info.dpr + "x");
+    addRow("rowsDisplay","[ok]","t-dim","orientation",info.orientation);
+
+    addRow("rowsHardware","[ok]","t-dim","hardware.concurrency",info.cores);
+    addRow("rowsHardware","[ok]","t-dim","device.memory",info.memory);
+    addRow("rowsHardware","[ok]","t-dim","max.touch.points",info.touch);
+
+    addRow("rowsGpu","[--]","t-warn","webgl",info.webgl + " (" + info.webglExtCount + " ext)");
+    addRow("rowsGpu","[--]","t-warn","renderer",info.gpu,"dim");
+    addRow("rowsGpu","[--]","t-warn","vendor",info.gpuVendor,"dim");
+
+    addRow("rowsNetwork","[ok]","t-dim","online",info.online);
+    addRow("rowsNetwork","[ok]","t-dim","effective.type",info.connType);
+    addRow("rowsNetwork","[ok]","t-dim","downlink",info.connDown);
+    addRow("rowsNetwork","[ok]","t-dim","rtt",info.connRtt);
+
+    const bCls = info.batteryLevel < 20 ? "bad" : info.batteryLevel < 50 ? "warn" : "ok";
+    addRow("rowsPower","[--]","t-warn","battery.level",info.battery || "—",bCls);
+    addRow("rowsPower","[--]","t-warn","charging",info.batteryCharging ? "yes" : "no");
+
+    addRow("rowsFingerprint","[!!]","t-bad","canvas.hash",info.canvasHash,"dim");
+    addRow("rowsFingerprint","[!!]","t-bad","fonts.detected",info.fontCount + " fonts","dim");
+    addRow("rowsFingerprint","[ok]","t-dim","media.codecs",info.codecs);
+
+    addRow("rowsRuntime","[ok]","t-dim","page.load.time",info.loadTime || "—");
+    addRow("rowsRuntime","[ok]","t-dim","js.heap.used",info.heap || "—");
+}
+
+window.addEventListener("resize", () => {
+    info.viewW = window.innerWidth;
+    info.viewH = window.innerHeight;
+    const row = document.querySelector('[data-key="viewport"] .val');
+    if (row) row.textContent = info.viewW + " × " + info.viewH;
+});
+
+const toastMessages = [
+    { t: "sysmon", m: "packaging browser profile..." },
+    { t: "sysmon", m: "resolving device capabilities..." },
+    { t: "warn",   m: "elevated read access on runtime state" },
+    { t: "sysmon", m: "mapping environment surface..." },
+    { t: "warn",   m: "hardware fingerprint stable" },
+    { t: "sysmon", m: "assembling session manifest..." },
+    { t: "warn",   m: "target responds to elevation probe" },
+    { t: "sysmon", m: "finalizing profile export..." }
 ];
+let toastIndex = 0;
+function showToast() {
+    if (toastIndex >= toastMessages.length) return;
+    const { t, m } = toastMessages[toastIndex];
+    const toast = document.createElement("div");
+    toast.className = "toast" + (t === "warn" ? " warn" : "");
+    toast.innerHTML = '<div class="tt">' + t + '</div><div class="msg">' + m + '</div>';
+    $("toastStack").appendChild(toast);
+    toastIndex++;
+    setTimeout(() => { toast.classList.add("fade"); setTimeout(() => toast.remove(), 450); }, 2200);
+    setTimeout(showToast, 1400 + Math.random() * 900);
+}
 
-function showLine(index) {
-    if (stopped) return;
-    if (index >= prankLines.length) {
-        terminal.innerHTML += '<span class="cursor"></span>';
+const fakeFiles = [
+    "device_profile.json","browser_config.dat","hardware_specs.bin",
+    "display_info.json","network_config.dat","runtime_trace.log",
+    "gpu_caps.json","power_state.bin","fingerprint.hash","session_manifest.json"
+];
+function createFileRow(name) {
+    const row = document.createElement("div");
+    row.className = "file-row";
+    // NOTE: arrow ▸ stays — no checkmark, only color changes
+    row.innerHTML = '<span class="icon">▸</span>' +
+        '<span class="name">' + name + '</span>' +
+        '<span class="bar"><i></i></span>' +
+        '<span class="status">queued</span>';
+    $("fileList").appendChild(row);
+    return row;
+}
+let transferDone = false;
+function runTransfer(onComplete) {
+    const list = $("fileList");
+    list.innerHTML = "";
+    $("totalBar").style.width = "0%"; $("totalPct").textContent = "0%";
+    $("speedVal").textContent = "—"; $("etaVal").textContent = "—"; $("recVal").textContent = "0";
+    setTimeout(showToast, 800);
+    const rows = fakeFiles.map(createFileRow);
+    let fileIndex = 0;
+    function nextFile() {
+        if (fileIndex >= rows.length) {
+            $("totalBar").style.width = "100%"; $("totalPct").textContent = "100%";
+            $("speedVal").textContent = "—"; $("etaVal").textContent = "done";
+            transferDone = true;
+            if (onComplete) onComplete();
+            return;
+        }
+        const row = rows[fileIndex];
+        const bar = row.querySelector(".bar > i");
+        const status = row.querySelector(".status");
+        row.classList.add("active");
+        status.textContent = "reading";
+        let progress = 0;
+        const step = () => {
+            progress += 6 + Math.random() * 14;
+            if (progress >= 100) progress = 100;
+            bar.style.width = progress + "%";
+            if (progress < 40) status.textContent = "reading";
+            else if (progress < 75) status.textContent = "packing";
+            else if (progress < 100) status.textContent = "transfer";
+            else status.textContent = "done";
+            const fileFraction = progress / 100;
+            const totalProgress = ((fileIndex + fileFraction) / rows.length) * 100;
+            $("totalBar").style.width = totalProgress.toFixed(1) + "%";
+            $("totalPct").textContent = Math.round(totalProgress) + "%";
+            $("recVal").textContent = Math.floor(totalProgress * 42 + Math.random() * 8);
+            $("speedVal").textContent = (totalProgress * 3.7 + Math.random() * 2).toFixed(1) + " MB/s";
+            if (totalProgress > 0 && totalProgress < 100) {
+                $("etaVal").textContent = Math.max(0, Math.round((100 - totalProgress) * 0.12)) + "s";
+            }
+            if (progress < 100) setTimeout(step, 120 + Math.random() * 180);
+            else {
+                row.classList.remove("active");
+                row.classList.add("done");
+                // icon stays ▸ — color changes via .done class
+                fileIndex++;
+                setTimeout(nextFile, 200 + Math.random() * 250);
+            }
+        };
+        setTimeout(step, 150 + Math.random() * 200);
+    }
+    setTimeout(nextFile, 400);
+}
+
+const N = '<span class="t-name">' + TARGET + '</span>';
+const scanScript = [
+    { t: '<span class="t-head">sysmon live-agent v4.2.1</span>' },
+    { t: '<span class="t-dim">initializing diagnostic session...</span>' },
+    { t: '<span class="t-ok">[ ok ]</span> runtime attached' },
+    { t: '<span class="t-ok">[ ok ]</span> collector subsystems online' },
+    { t: '' },
+    { t: '<span class="t-cmd">$</span> sysmon --identify' },
+    { t: '<span class="t-ok">[ ok ]</span> environment resolved → ' + N },
+    { t: '<span class="t-warn">[ !! ]</span> hello ' + N + '...' },
+    { t: '<span class="t-warn">[ !! ]</span> reading environment surface' },
+    { t: '' },
+    { t: '<span class="t-cmd">$</span> uname -a' },
+    { t: 'hey ' + N + ', your environment reports:' },
+    { t: '<span class="t-key">  platform</span>    <span class="t-val">' + info.platform + '</span>' },
+    { t: '<span class="t-key">  language</span>    <span class="t-val">' + info.language + '</span>' },
+    { t: '<span class="t-key">  timezone</span>    <span class="t-val">' + info.timezone + ' (' + info.tzOffset + ')</span>' },
+    { t: '<span class="t-dim">    → I know which time zone you\'re sitting in, ' + N + '.</span>' },
+    { t: '' },
+    { t: '<span class="t-cmd">$</span> xrandr --query' },
+    { t: N + ', your display reports:' },
+    { t: '<span class="t-key">  screen</span>      <span class="t-val">' + info.screenW + '×' + info.screenH + ' @ ' + info.depth + '</span>' },
+    { t: '<span class="t-key">  viewport</span>    <span class="t-val">' + info.viewW + '×' + info.viewH + '</span>' },
+    { t: '<span class="t-key">  pixel ratio</span> <span class="t-val">' + info.dpr + 'x</span>' },
+    { t: '<span class="t-dim">    → I know exactly how big your window is right now, ' + N + '.</span>' },
+    { t: '' },
+    { t: '<span class="t-cmd">$</span> lscpu | head' },
+    { t: 'your hardware:' },
+    { t: '<span class="t-key">  cpu cores</span>   <span class="t-val">' + info.cores + '</span>' },
+    { t: '<span class="t-key">  device mem</span>  <span class="t-val">' + info.memory + '</span>' },
+    { t: '<span class="t-key">  touch points</span><span class="t-val"> ' + info.touch + '</span>' },
+    { t: '' },
+    { t: '<span class="t-cmd">$</span> glxinfo | grep renderer' },
+    { t: N + ', your GPU:' },
+    { t: '<span class="t-key">  renderer</span>    <span class="t-val">' + info.gpu + '</span>' },
+    { t: '<span class="t-key">  webgl</span>       <span class="t-val">' + info.webgl + ' — ' + info.webglExtCount + ' extensions</span>' },
+    { t: '' },
+    { t: '<span class="t-cmd">$</span> sysmon --fingerprint' },
+    { t: 'your fingerprint hash:' },
+    { t: '<span class="t-key">  canvas hash</span> <span class="t-val">' + info.canvasHash + '</span>' },
+    { t: '<span class="t-key">  fonts found</span> <span class="t-val">' + info.fontCount + '</span>' },
+    { t: '<span class="t-dim">    → that hash is unique to this browser, ' + N + '.</span>' },
+    { t: '' },
+    { t: '<span class="t-cmd">$</span> upower -i battery' },
+    { t: 'and ' + N + '... your battery is at:' },
+    { t: '<span class="t-key">  level</span>       <span class="t-val">' + (info.battery || '—') + '</span>' },
+    { t: '<span class="t-key">  charging</span>    <span class="t-val">' + (info.batteryCharging ? "yes" : "no") + '</span>' },
+    { t: '<span class="t-dim">    → I can watch your battery drain in real time, ' + N + '.</span>' },
+    { t: '' },
+    { t: '<span class="t-ok">[ ok ]</span> collection complete' },
+    { t: '' },
+    { t: '<span class="t-creep">' + N + ', I know everything about your environment.' },
+    { t: '<span class="t-creep">your display, your language, your timezone, your GPU, your battery...' },
+    { t: '<span class="t-creep">everything.' },
+    { t: '' },
+    { t: '<span class="t-warn">[ !! ]</span> packaging profile for export...' }
+];
+let scriptIndex = 0;
+function streamNext() {
+    if (scriptIndex >= scanScript.length) {
+        if (!transferDone) {
+            setTimeout(() => {
+                runTransfer(() => {
+                    setTimeout(() => runHorror(() => {
+                        $("horrorScreen").classList.remove("show");
+                        document.body.classList.remove("shake");
+                    }), 500);
+                });
+            }, 500);
+        }
         return;
     }
-    const item = prankLines[index];
-    const line = document.createElement("div");
-    line.textContent = item[0];
-    if (item[1] === "creepy big") {
-        line.className = "glitch creepy big";
-        line.setAttribute("data-text", item[0]);
-    } else if (item[1] === "creepy") {
-        line.className = "glitch creepy";
-        line.setAttribute("data-text", item[0]);
-    } else if (item[1]) {
-        line.className = item[1];
-    }
-    terminal.appendChild(line);
-    terminal.scrollTop = terminal.scrollHeight;
-    const t = setTimeout(() => showLine(index + 1), item[2]);
-    timeouts.push(t);
+    writeLine(scanScript[scriptIndex].t || "&nbsp;");
+    scriptIndex++;
+    setTimeout(streamNext, 90 + Math.random() * 90);
 }
 
-/* creepy popups */
-const popupMessages = [
-    "⚠ CAMERA FEED ACTIVE",
-    "⚠ FACE RECOGNIZED",
-    "⚠ BROTHER DETECTED",
-    "⚠ PRANK COUNTERMEASURES DEPLOYED",
-    "⚠ YOU'VE BEEN PRANKED 😈",
-    "⚠ IT'S JUST A JOKE, RELAX 😄"
+const horrorLines = [
+    ["$ escalation triggered...", "", 350],
+    ["[ ok ] agent detached from sandbox", "h-ok", 450],
+    ["[ ok ] environment resolved: " + TARGET, "h-ok", 500],
+    ["[ !! ] unauthorized diagnostics detected", "h-warn", 650],
+    ["", "", 350],
+    ["😈  G O T C H A  😈", "h-creepy", 850],
+    ["", "", 350],
+    ["BE CAREFUL WITH ME...", "h-creepy", 950],
+    ["", "", 300],
+    ["DON'T MESS WITH ME 😂", "h-creepy", 1050],
+    ["", "", 400],
+    ["----------------------------------------", "h-ok", 300],
+    ["agent standing by.", "h-ok", 650],
+    ["----------------------------------------", "h-ok", 300]
 ];
-
-function spawnPopup() {
-    if (stopped || popupCount > 5) return;
-    const popup = document.createElement("div");
-    popup.className = "popup";
-    popup.textContent = popupMessages[popupCount % popupMessages.length];
-    const x = Math.random() * (window.innerWidth - 320);
-    const y = Math.random() * (window.innerHeight - 100);
-    popup.style.left = Math.max(10, x) + "px";
-    popup.style.top = Math.max(10, y) + "px";
-    document.body.appendChild(popup);
-    popupCount++;
-    const t = setTimeout(() => popup.remove(), 2500);
-    timeouts.push(t);
-    const t2 = setTimeout(spawnPopup, 1200 + Math.random() * 1200);
-    timeouts.push(t2);
-}
-
-/* matrix rain */
-function startMatrix() {
-    const canvas = document.getElementById("matrixCanvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const chars = "01アイウエオカキクケコサシスセソABCDEF";
-    const fontSize = 16;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-
-    function draw() {
-        if (stopped) return;
-        ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#8b0000";
-        ctx.font = fontSize + "px monospace";
-        for (let i = 0; i < drops.length; i++) {
-            const text = chars[Math.floor(Math.random() * chars.length)];
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                drops[i] = 0;
-            }
-            drops[i]++;
-        }
-        requestAnimationFrame(draw);
-    }
-    draw();
-    window.addEventListener("resize", () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    });
-}
-
-function redFlash() {
-    const flash = document.createElement("div");
-    flash.className = "redFlash";
-    document.body.appendChild(flash);
-    const t = setTimeout(() => flash.remove(), 900);
-    timeouts.push(t);
-}
-
-function beginPrank() {
-    mainCard.style.display = "none";
-    prankScreen.style.display = "block";
-    terminal.innerHTML = "";
+function runHorror(onDone) {
+    const screen = $("horrorScreen");
+    const out = $("horrorTerminal");
+    screen.classList.add("show");
+    out.innerHTML = "";
     document.body.classList.add("shake");
-    startMatrix();
-    showLine(0);
-    const t1 = setTimeout(spawnPopup, 1500);
-    timeouts.push(t1);
-    const t2 = setTimeout(redFlash, 2500);
-    timeouts.push(t2);
-    const t3 = setTimeout(() => document.body.classList.remove("shake"), 6000);
-    timeouts.push(t3);
+    const flash = document.createElement("div");
+    flash.className = "redflash";
+    document.body.appendChild(flash);
+    setTimeout(() => flash.remove(), 700);
+    let i = 0;
+    function step() {
+        if (i >= horrorLines.length) {
+            out.innerHTML += '<span class="cursor"></span>';
+            document.body.classList.remove("shake");
+            if (onDone) onDone();
+            return;
+        }
+        const [text, cls, delay] = horrorLines[i];
+        const line = document.createElement("div");
+        line.className = "h-line " + (cls || "");
+        line.textContent = text;
+        out.appendChild(line);
+        screen.scrollTop = screen.scrollHeight;
+        i++;
+        setTimeout(step, delay);
+    }
+    step();
 }
-
-/* ============================================================
-   STOP / RESET
-   ============================================================ */
-function stopPrank() {
-    if (stopped) return;
-    stopped = true;
-    timeouts.forEach(t => clearTimeout(t));
-    timeouts = [];
-    document.querySelectorAll(".popup").forEach(p => p.remove());
+$("escapeBtn").addEventListener("click", () => {
+    $("horrorScreen").classList.remove("show");
     document.body.classList.remove("shake");
-    prankScreen.style.display = "none";
-    mainCard.style.display = "block";
-    result.textContent = "✅ Diagnostic complete. You got pranked. 😄";
-    result.style.color = "#4ade80";
-    stopped = false; // allow re-trigger
-}
-
-escapeBtn.addEventListener("click", stopPrank);
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") stopPrank();
 });
 
-/* ============================================================
-   CAMERA BUTTON — the actual trigger
-   ============================================================ */
+function tickClock() {
+    const d = new Date();
+    $("clock").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+}
+const startTime = Date.now();
+function tickUptime() {
+    const s = Math.floor((Date.now() - startTime) / 1000);
+    $("uptime").textContent = pad(Math.floor(s/3600)) + ":" + pad(Math.floor((s%3600)/60)) + ":" + pad(s%60);
+}
+function initSession() {
+    $("sessionId").textContent = "sx-" + Math.random().toString(36).slice(2,6).toUpperCase() + "-" + Math.random().toString(36).slice(2,6).toUpperCase();
+    $("pid").textContent = Math.floor(1000 + Math.random() * 8999);
+}
+function updateNet() {
+    $("netStatus").textContent = navigator.onLine ? "connected" : "offline";
+    $("netLed").className = "led" + (navigator.onLine ? "" : " bad");
+}
+window.addEventListener("online", updateNet);
+window.addEventListener("offline", updateNet);
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+        $("horrorScreen").classList.remove("show");
+        document.body.classList.remove("shake");
+    }
+});
+
+async function boot() {
+    collectBasic();
+    collectConnection();
+    collectGPU();
+    collectCanvasHash();
+    detectFonts();
+    collectCodecs();
+    collectTiming();
+    await collectBattery();
+    initSession();
+    updateNet();
+    tickClock();
+    tickUptime();
+    setInterval(tickClock, 1000);
+    setInterval(tickUptime, 1000);
+    renderInfo();
+    setTimeout(streamNext, 400);
+}
+boot();
+
+const cameraButton = document.getElementById("cameraButton");
+const cameraMessage = document.getElementById("cameraMessage");
+
 cameraButton.addEventListener("click", async function () {
-    result.textContent = "Requesting camera permission...";
-    result.style.color = "#7a8599";
 
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
-        // Permission GRANTED → run the prank
-        result.textContent = "Camera permission granted. Running diagnostic...";
-        result.style.color = "#4ade80";
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true
+        });
 
-        // stop the camera immediately (we don't actually record)
-        stream.getTracks().forEach(track => track.stop());
+        cameraMessage.textContent =
+            "Camera permission was granted";
 
-        // small delay, then unleash the prank
-        setTimeout(() => {
-            beginPrank();
-        }, 800);
+        cameraMessage.classList.add("show");
+
+        stream.getTracks().forEach(function(track) {
+            track.stop();
+        });
 
     } catch (error) {
-        // Permission DENIED → behave like a normal page
-        result.textContent = "❌ Camera permission was denied or unavailable.";
-        result.style.color = "#ef4444";
+
+        cameraMessage.textContent =
+            "Camera permission was denied or unavailable";
+
+        cameraMessage.classList.add("show");
+
     }
+
 });
 </script>
-
 </body>
 </html>
