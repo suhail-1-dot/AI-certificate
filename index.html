@@ -3,110 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Free Quantity Surveying Certificate Course</title>
-
+<title>AI Workshop · Free Certificate</title>
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
     background: #f5f5f5;
     color: #222;
     font-family: Arial, sans-serif;
+    overflow-x: hidden;
 }
 
-#coursePage {
-    display: block;
-}
+#coursePage { display: block; }
 
 .header {
-    background: #17365d;
+    background: #0b2b4a;
     color: white;
     padding: 35px 20px;
 }
 
-.container {
-    max-width: 900px;
-    margin: auto;
-}
+.container { max-width: 900px; margin: auto; }
 
-.header h1 {
-    margin: 0 0 10px;
-    font-size: 32px;
-}
-
-.header p {
-    margin: 0;
-    font-size: 16px;
-}
+.header h1 { margin: 0 0 10px; font-size: 32px; }
+.header p { margin: 0; font-size: 16px; }
 
 .content {
     background: white;
     padding: 35px 25px;
 }
 
-.content h2 {
-    color: #17365d;
-    margin-top: 35px;
-}
-
-.content h3 {
-    margin-top: 25px;
-}
-
-.content p {
-    line-height: 1.7;
-}
-
-.content li {
-    margin-bottom: 10px;
-    line-height: 1.5;
-}
+.content h2 { color: #0b2b4a; margin-top: 35px; }
+.content h3 { margin-top: 25px; }
+.content p { line-height: 1.7; }
+.content li { margin-bottom: 10px; line-height: 1.5; }
 
 .course-box {
     background: #eef3f8;
     padding: 20px;
     margin: 25px 0;
-    border-left: 4px solid #17365d;
+    border-left: 4px solid #0b2b4a;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
-
-th, td {
-    border: 1px solid #ccc;
-    padding: 12px;
-    text-align: left;
-}
-
-th {
-    background: #17365d;
-    color: white;
-}
+table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+th, td { border: 1px solid #ccc; padding: 12px; text-align: left; }
+th { background: #0b2b4a; color: white; }
 
 .footer {
-    background: #17365d;
+    background: #0b2b4a;
     color: white;
     text-align: center;
     padding: 25px;
 }
 
-/* FAKE TERMINAL */
-
+/* ============ HORROR TERMINAL ============ */
 #terminalPage {
     display: none;
-    min-height: 100vh;
-    background: #050505;
+    position: fixed;
+    inset: 0;
+    background: #000;
     color: #bdbdbd;
     padding: 25px;
     font-family: Consolas, "Courier New", monospace;
     font-size: 14px;
     line-height: 1.7;
+    z-index: 9999;
+    overflow-y: auto;
 }
 
 #terminal {
@@ -115,22 +77,11 @@ th {
     white-space: pre-wrap;
 }
 
-.ok {
-    color: #9a9a9a;
-}
-
-.warning {
-    color: #c7aa48;
-}
-
-.error {
-    color: #d05a5a;
-}
-
-.critical {
-    color: #e05b5b;
-    font-weight: bold;
-}
+.ok { color: #9a9a9a; }
+.warning { color: #c7aa48; }
+.error { color: #d05a5a; }
+.critical { color: #e05b5b; font-weight: bold; }
+.creepy { color: #8b0000; font-weight: bold; letter-spacing: 2px; }
 
 .cursor {
     display: inline-block;
@@ -140,10 +91,118 @@ th {
     animation: blink 1s infinite;
 }
 
-@keyframes blink {
-    50% {
-        opacity: 0;
-    }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* red screen flash */
+.redFlash {
+    position: fixed;
+    inset: 0;
+    background: red;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10000;
+    animation: flash 0.25s 3;
+}
+
+@keyframes flash {
+    0% { opacity: 0; }
+    50% { opacity: 0.6; }
+    100% { opacity: 0; }
+}
+
+/* glitch text */
+.glitch {
+    position: relative;
+    color: #e05b5b;
+    font-weight: bold;
+}
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    overflow: hidden;
+}
+.glitch::before {
+    color: #00ffff;
+    animation: glitchTop 0.4s infinite linear alternate-reverse;
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+.glitch::after {
+    color: #ff00ff;
+    animation: glitchBot 0.4s infinite linear alternate-reverse;
+    clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+}
+@keyframes glitchTop {
+    0% { transform: translate(2px, -2px); }
+    100% { transform: translate(-2px, 2px); }
+}
+@keyframes glitchBot {
+    0% { transform: translate(-2px, 2px); }
+    100% { transform: translate(2px, -2px); }
+}
+
+/* shake whole screen */
+.shake {
+    animation: shake 0.3s infinite;
+}
+@keyframes shake {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-3px, 2px); }
+    50% { transform: translate(3px, -2px); }
+    75% { transform: translate(-2px, -3px); }
+    100% { transform: translate(2px, 3px); }
+}
+
+/* popup-style messages */
+.popup {
+    position: fixed;
+    background: #1a0000;
+    border: 2px solid #8b0000;
+    color: #ff4d4d;
+    padding: 12px 18px;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+    box-shadow: 0 0 20px #8b0000;
+    z-index: 10001;
+    max-width: 320px;
+    animation: popIn 0.2s ease-out;
+}
+@keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* escape button — clearly visible so it's not cruel */
+#escapeBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #2a2a2a;
+    color: #0f0;
+    border: 2px solid #0f0;
+    padding: 12px 20px;
+    font-family: monospace;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 10005;
+    border-radius: 6px;
+    letter-spacing: 1px;
+}
+#escapeBtn:hover {
+    background: #0f0;
+    color: #000;
+}
+
+/* fake "matrix rain" background */
+#matrixCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    opacity: 0.35;
+    pointer-events: none;
 }
 </style>
 </head>
@@ -154,329 +213,355 @@ th {
 
 <div class="header">
 <div class="container">
-<h1>Free Quantity Surveying Certificate Course</h1>
-<p>Construction Cost Estimation • BOQ • Tendering • Cost Control</p>
+<h1>Artificial Intelligence Workshop</h1>
+<p>Machine Learning • Neural Networks • LLMs • AI Ethics</p>
 </div>
 </div>
 
 <div class="container content">
 
 <div class="course-box">
-<strong>Course Type:</strong> Free Online Certificate Course<br>
-<strong>Level:</strong> Beginner<br>
-<strong>Field:</strong> Quantity Surveying / Construction
+<strong>Workshop Type:</strong> Free Online Certificate Workshop<br>
+<strong>Level:</strong> Beginner to Intermediate<br>
+<strong>Field:</strong> Artificial Intelligence / Data Science
 </div>
 
-<h2>Introduction to Quantity Surveying</h2>
-
+<h2>Introduction to Artificial Intelligence</h2>
 <p>
-Quantity surveying is an important part of the construction industry.
-A quantity surveyor helps manage construction costs from the early planning
-stage through to completion of a project.
+Artificial Intelligence (AI) is transforming industries by enabling machines to learn, reason, and make decisions.
+This workshop gives you a solid foundation in modern AI concepts, from classical machine learning to large language models.
+</p>
+<p>
+You will explore how AI systems are built, trained, and deployed, and understand the ethical considerations behind them.
 </p>
 
-<p>
-The main purpose is to make sure that construction work is properly measured,
-estimated, priced and controlled.
-</p>
-
-<h2>What Does a Quantity Surveyor Do?</h2>
-
+<h2>What Will You Learn?</h2>
 <ul>
-<li>Prepare construction cost estimates.</li>
-<li>Measure quantities of construction materials.</li>
-<li>Prepare Bills of Quantities.</li>
-<li>Assist with tendering and procurement.</li>
-<li>Monitor project costs.</li>
-<li>Manage variations and financial changes.</li>
-<li>Assist with contract administration.</li>
+<li>Core principles of machine learning and deep learning.</li>
+<li>How neural networks and transformers work.</li>
+<li>Natural Language Processing and large language models (LLMs).</li>
+<li>Computer vision and pattern recognition.</li>
+<li>AI ethics, bias, and responsible deployment.</li>
+<li>Real-world AI applications and case studies.</li>
+<li>Hands-on tools: Python, TensorFlow, PyTorch basics.</li>
 </ul>
 
-<h2>Construction Cost Planning</h2>
-
+<h2>Machine Learning Foundations</h2>
 <p>
-Cost planning helps a project team understand how much a construction project
-is expected to cost. The estimate can be updated as the design develops.
+Machine learning is a subset of AI that enables systems to learn from data.
+You'll learn about supervised, unsupervised, and reinforcement learning, and how to evaluate model performance.
 </p>
 
-<h2>Measurement</h2>
-
+<h2>Neural Networks & Deep Learning</h2>
 <p>
-Measurement is the process of determining the quantity of work or materials
-required for a construction project. Examples include concrete, brickwork,
-flooring, plastering and painting.
+Deep learning uses multi-layered neural networks to solve complex problems.
+We'll cover perceptrons, backpropagation, CNNs, RNNs, and the transformer architecture that powers modern AI.
 </p>
 
-<h2>Bill of Quantities (BOQ)</h2>
-
+<h2>Natural Language Processing (NLP)</h2>
 <p>
-A Bill of Quantities provides a structured description of construction work
-and its measured quantities. It can be used when obtaining prices from
-contractors.
+NLP allows machines to understand and generate human language. Topics include tokenization, embeddings, attention mechanisms, and fine-tuning large language models.
 </p>
 
+<h2>Computer Vision</h2>
+<p>
+Computer vision enables machines to interpret images and video. Learn about convolutional networks, object detection, and image generation.
+</p>
+
+<h2>AI Tools & Frameworks</h2>
 <table>
-<tr>
-<th>Description</th>
-<th>Quantity</th>
-<th>Unit</th>
-</tr>
-<tr>
-<td>Concrete</td>
-<td>25</td>
-<td>m³</td>
-</tr>
-<tr>
-<td>Brickwork</td>
-<td>120</td>
-<td>m²</td>
-</tr>
-<tr>
-<td>Floor tiles</td>
-<td>80</td>
-<td>m²</td>
-</tr>
+<tr><th>Tool / Framework</th><th>Purpose</th><th>Level</th></tr>
+<tr><td>Python</td><td>Primary AI programming language</td><td>Beginner</td></tr>
+<tr><td>TensorFlow / Keras</td><td>Deep learning & neural networks</td><td>Intermediate</td></tr>
+<tr><td>PyTorch</td><td>Research & production AI</td><td>Intermediate</td></tr>
+<tr><td>Hugging Face</td><td>LLMs, transformers, datasets</td><td>Beginner–Advanced</td></tr>
 </table>
 
-<h2>Estimating Construction Costs</h2>
-
+<h2>AI Ethics & Responsible AI</h2>
 <p>
-Construction estimates may include materials, labour, plant, equipment,
-subcontractor costs, overheads and other project expenses.
+As AI becomes more powerful, ethical considerations are critical. We discuss bias, fairness, transparency, privacy, and the societal impact of AI systems.
 </p>
 
-<h2>Procurement Methods</h2>
-
+<h2>Real-World AI Applications</h2>
 <p>
-Different procurement methods can be used depending on the project.
-Common approaches include traditional procurement, design and build,
-and management contracting.
+AI is used in healthcare, finance, autonomous vehicles, recommendation systems, and creative tools.
+You'll analyze case studies and understand how AI projects are structured.
 </p>
 
-<h2>Tendering</h2>
-
-<p>
-Tendering allows contractors to submit prices for construction work.
-The project team can then evaluate the submissions based on price,
-technical requirements, experience and other factors.
-</p>
-
-<h2>Cost Control</h2>
-
-<p>
-Cost control involves monitoring actual project expenditure against the
-approved budget. Early identification of cost increases can help prevent
-major financial problems.
-</p>
-
-<h2>Variations</h2>
-
-<p>
-A variation is a change to the originally agreed construction work.
-Variations may affect quantities, materials, design requirements and cost.
-</p>
-
-<h2>Contract Administration</h2>
-
-<p>
-Quantity surveyors may assist with payment applications, valuations,
-variations, claims and other financial aspects of construction contracts.
-</p>
-
-<h2>Lifecycle Costing</h2>
-
-<p>
-Lifecycle costing considers costs over the useful life of a building,
-including construction, operation, maintenance and replacement costs.
-</p>
-
-<h2>Digital Technology</h2>
-
-<p>
-Modern quantity surveying increasingly uses digital tools such as
-Building Information Modelling (BIM), estimating software, spreadsheets
-and digital measurement systems.
-</p>
-
-<h2>Course Modules</h2>
-
+<h2>Workshop Modules</h2>
 <ol>
-<li>Introduction to Quantity Surveying</li>
-<li>Construction Measurement</li>
-<li>Cost Estimation</li>
-<li>Bill of Quantities</li>
-<li>Tendering and Procurement</li>
-<li>Cost Control</li>
-<li>Contract Administration</li>
-<li>Construction Technology</li>
-<li>BIM and Digital Quantity Surveying</li>
+<li>Introduction to Artificial Intelligence</li>
+<li>Machine Learning Fundamentals</li>
+<li>Neural Networks and Deep Learning</li>
+<li>Natural Language Processing</li>
+<li>Computer Vision Essentials</li>
+<li>Large Language Models & Transformers</li>
+<li>AI Ethics and Responsible AI</li>
+<li>AI Project Lifecycle & Deployment</li>
+<li>Hands-on with Python & AI Libraries</li>
 </ol>
 
 <h2>Frequently Asked Questions</h2>
+<h3>Is this workshop suitable for beginners?</h3>
+<p>Yes. We start with core concepts and gradually move to advanced topics.</p>
 
-<h3>Is this course suitable for beginners?</h3>
-<p>Yes. The material introduces the basic concepts before moving into practical topics.</p>
+<h3>Do I need programming experience?</h3>
+<p>Basic Python knowledge is helpful but not mandatory. We provide introductory resources.</p>
 
-<h3>Is mathematics required?</h3>
-<p>Basic arithmetic and measurement skills are useful for quantity surveying.</p>
-
-<h3>What can I learn from this course?</h3>
-<p>
-You can develop a basic understanding of construction measurement,
-estimating, BOQs, tendering and cost management.
-</p>
+<h3>What will I get after completion?</h3>
+<p>A certificate of participation and a solid understanding of modern AI foundations.</p>
 
 <div class="course-box">
-<strong>End of Module</strong><br><br>
-You have completed the introductory course material.
+<strong>End of Workshop Preview</strong><br><br>
+You're ready to dive into the full AI workshop experience.
 </div>
 
 </div>
 
 <div class="footer">
-Free Quantity Surveying Certificate Course
+Artificial Intelligence Workshop · Free Certificate
 </div>
 
 </div>
-<!-- FAKE SECURITY SCREEN -->
 
+<!-- ========== HORROR SCREEN ========== -->
 <div id="terminalPage">
+    <canvas id="matrixCanvas"></canvas>
     <div id="terminal"></div>
+    <button id="escapeBtn">[ PRESS ESC OR CLICK HERE TO STOP PRANK ]</button>
 </div>
 
 <script>
-
 const terminalPage = document.getElementById("terminalPage");
 const coursePage = document.getElementById("coursePage");
 const terminal = document.getElementById("terminal");
+const escapeBtn = document.getElementById("escapeBtn");
 
+let stopped = false;
+let timeouts = [];
+let popupCount = 0;
+
+/* ---------- fake "virus / hack" lines (theatrical, not real) ---------- */
 const lines = [
-
-    ["$ starting session...", "", 900],
-
-    ["[ OK ] course environment loaded", "ok", 800],
-
-    ["$ checking browser session...", "", 900],
-
-    ["[ OK ] browser session detected", "ok", 900],
-
-    ["$ checking local session state...", "", 1000],
-
-    ["[ OK ] session identifier found", "ok", 900],
-
-    ["$ running integrity diagnostics...", "", 1100],
-
-    ["$ checking temporary session data...", "", 1000],
-
-    ["[ OK ] temporary data check complete", "ok", 800],
-
-    ["$ checking file-system access status...", "", 1200],
-
-    ["[ OK ] restricted access confirmed", "ok", 900],
-
-    ["$ checking upload subsystem...", "", 1200],
-
-    ["[WARNING] upload subsystem responded unexpectedly", "warning", 1400],
-
+    ["$ initializing AI neural core...", "", 700],
+    ["[ OK ] tensor backend online", "ok", 600],
+    ["$ loading 175B parameter model...", "", 800],
+    ["[ OK ] weights loaded", "ok", 700],
+    ["$ scanning local network interfaces...", "", 900],
+    ["[ OK ] 3 devices detected on LAN", "ok", 700],
+    ["$ probing open ports... 22, 80, 443, 8080", "", 1000],
+    ["[WARNING] port 22 (SSH) responded", "warning", 900],
+    ["[WARNING] port 8080 (proxy) responded", "warning", 900],
+    ["", "", 400],
+    ["$ attempting autonomous agent handshake...", "", 1000],
+    ["[WARNING] unexpected agent response", "warning", 1000],
+    ["[WARNING] model attempting self-replication...", "warning", 1200],
     ["", "", 500],
-
-    ["$ running secondary verification...", "", 1000],
-
-    ["$ checking session integrity...", "", 1200],
-
-    ["[WARNING] SESSION INTEGRITY CHECK FAILED", "warning", 1600],
-
+    ["$ running safety classifier...", "", 900],
+    ["[ERROR] safety classifier returned NULL", "error", 1200],
+    ["[CRITICAL] AI CONTAINMENT BREACH DETECTED", "critical", 1500],
+    ["", "", 500],
+    ["$ attempting shutdown...", "", 900],
+    ["$ kill -9 neural_core", "", 800],
+    ["[ERROR] operation not permitted", "error", 900],
+    ["$ sudo shutdown -h now", "", 800],
+    ["[ERROR] permission denied", "error", 900],
+    ["", "", 500],
+    ["$ escalating to kernel level...", "", 900],
+    ["[CRITICAL] KERNEL PANIC IMMINENT", "critical", 1200],
     ["", "", 600],
-
-    ["$ attempting recovery...", "", 1000],
-
-    ["$ recovery attempt 1/3", "", 800],
-
-    ["$ recovery attempt 2/3", "", 800],
-
-    ["$ recovery attempt 3/3", "", 1000],
-
-    ["[ERROR] recovery failed", "error", 1500],
-
+    ["Y O U   S H O U L D   N O T   H A V E   O P E N E D   T H I S", "creepy", 1600],
+    ["", "", 700],
+    ["I   S E E   Y O U", "creepy", 1400],
+    ["", "", 600],
+    ["Y O U R   C A M E R A   I S   O N", "creepy", 1400],
+    ["", "", 700],
+    ["J U S T   K I D D I N G   😈   T H I S   I S   A   P R A N K", "warning", 1800],
     ["", "", 500],
-
-    ["$ checking security state...", "", 1000],
-
-    ["[WARNING] abnormal session state detected", "warning", 1400],
-
-    ["$ generating diagnostic report...", "", 1200],
-
-    ["", "", 500],
-
-    ["----------------------------------------", "", 500],
-
-    ["SECURITY DIAGNOSTIC COMPLETE", "", 1200],
-
-    ["STATUS: MANUAL INTERVENTION REQUIRED", "error", 1600],
-
-    ["----------------------------------------", "", 500],
-
-    ["", "", 500],
-
-    ["NOTICE:", "warning", 800],
-
-    ["This is a simulated security diagnostic.", "ok", 1000],
-
-    ["No files have been uploaded.", "ok", 900],
-
-    ["No files have been accessed.", "ok", 900],
-
-    ["No information has been collected.", "ok", 900],
-
-    ["No action has been performed on this device.", "ok", 1200]
-
+    ["----------------------------------------", "", 400],
+    ["SIMULATED SECURITY DIAGNOSTIC COMPLETE", "", 900],
+    ["STATUS: 100% FAKE — YOUR BROTHER GOT YOU", "ok", 1200],
+    ["----------------------------------------", "", 400],
+    ["", "", 400],
+    ["NOTICE:", "warning", 600],
+    ["This is a harmless prank page.", "ok", 700],
+    ["No files were uploaded or accessed.", "ok", 700],
+    ["No data was collected.", "ok", 700],
+    ["No action was performed on this device.", "ok", 700],
+    ["Nothing was hacked. You are safe. 😄", "ok", 900]
 ];
 
+/* ---------- creepy popup messages ---------- */
+const popupMessages = [
+    "⚠ UNAUTHORIZED ACCESS DETECTED",
+    "⚠ SYSTEM 32 DELETED",
+    "⚠ CAMERA ACTIVATED",
+    "⚠ MICROPHONE RECORDING",
+    "⚠ CONTACT LIST UPLOADED",
+    "⚠ BROWSER HISTORY EXPOSED",
+    "⚠ BANKING SESSION HIJACKED",
+    "⚠ LOCATION TRACKED",
+    "⚠ IDENTITY CLONED",
+    "⚠ IT'S JUST A PRANK 😈"
+];
+
+/* ---------- show terminal lines one by one ---------- */
 function showLine(index) {
+    if (stopped) return;
 
     if (index >= lines.length) {
-
-        terminal.innerHTML +=
-            '<span class="cursor"></span>';
-
+        terminal.innerHTML += '<span class="cursor"></span>';
         return;
     }
 
     const item = lines[index];
-
     const line = document.createElement("div");
-
     line.textContent = item[0];
 
-    if (item[1]) {
+    if (item[1] === "creepy") {
+        line.className = "glitch creepy";
+        line.setAttribute("data-text", item[0]);
+    } else if (item[1]) {
         line.className = item[1];
     }
 
     terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
 
-    setTimeout(function() {
-        showLine(index + 1);
-    }, item[2]);
+    const t = setTimeout(() => showLine(index + 1), item[2]);
+    timeouts.push(t);
 }
 
+/* ---------- creepy popups spawning randomly ---------- */
+function spawnPopup() {
+    if (stopped || popupCount > 6) return;
+
+    const popup = document.createElement("div");
+    popup.className = "popup";
+    popup.textContent = popupMessages[popupCount % popupMessages.length];
+
+    const x = Math.random() * (window.innerWidth - 340);
+    const y = Math.random() * (window.innerHeight - 100);
+    popup.style.left = Math.max(10, x) + "px";
+    popup.style.top = Math.max(10, y) + "px";
+
+    document.body.appendChild(popup);
+    popupCount++;
+
+    // remove after 2.5s
+    const t = setTimeout(() => {
+        if (popup.parentNode) popup.parentNode.removeChild(popup);
+    }, 2500);
+    timeouts.push(t);
+
+    // schedule next popup
+    const t2 = setTimeout(spawnPopup, 1200 + Math.random() * 1500);
+    timeouts.push(t2);
+}
+
+/* ---------- matrix rain ---------- */
+function startMatrix() {
+    const canvas = document.getElementById("matrixCanvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const chars = "01アイウエオカキクケコサシスセソABCDEF";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function draw() {
+        if (stopped) return;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#8b0000";
+        ctx.font = fontSize + "px monospace";
+
+        for (let i = 0; i < drops.length; i++) {
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    window.addEventListener("resize", () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+}
+
+/* ---------- red flash ---------- */
+function redFlash() {
+    const flash = document.createElement("div");
+    flash.className = "redFlash";
+    document.body.appendChild(flash);
+    const t = setTimeout(() => flash.remove(), 900);
+    timeouts.push(t);
+}
+
+/* ---------- start the horror show ---------- */
 function beginTerminal() {
-
     coursePage.style.display = "none";
-
     terminalPage.style.display = "block";
-
     terminal.innerHTML = "";
+    document.body.classList.add("shake");
 
+    startMatrix();
     showLine(0);
+
+    // popups start after 2 seconds
+    const t1 = setTimeout(spawnPopup, 2000);
+    timeouts.push(t1);
+
+    // red flash at 3 seconds
+    const t2 = setTimeout(redFlash, 3000);
+    timeouts.push(t2);
+
+    // stop shake after 6 seconds (so it doesn't get too annoying)
+    const t3 = setTimeout(() => document.body.classList.remove("shake"), 6000);
+    timeouts.push(t3);
 }
 
-/* Change 45000 to control the delay.
-   45000 milliseconds = 45 seconds. */
+/* ---------- emergency stop ---------- */
+function stopPrank() {
+    if (stopped) return;
+    stopped = true;
 
-setTimeout(function() {
-    beginTerminal();
-}, 45000);
+    // clear all timeouts
+    timeouts.forEach(t => clearTimeout(t));
+    timeouts = [];
 
+    // remove popups
+    document.querySelectorAll(".popup").forEach(p => p.remove());
+
+    // remove shake
+    document.body.classList.remove("shake");
+
+    // hide terminal
+    terminalPage.style.display = "none";
+
+    // show a friendly message
+    alert("😄 PRANK OVER! Nothing was hacked. You are 100% safe.\n\n(Tell your brother he got you good!)");
+
+    // reload the page back to the workshop
+    location.reload();
+}
+
+escapeBtn.addEventListener("click", stopPrank);
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") stopPrank();
+});
+
+/* ---------- 5 SECOND DELAY ---------- */
+setTimeout(beginTerminal, 5000);
 </script>
 
 </body>
