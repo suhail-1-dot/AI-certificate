@@ -3,61 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Workshop · Free Certificate</title>
+<title>Browser Security Lab</title>
 <style>
 * { box-sizing: border-box; }
 
 body {
     margin: 0;
-    background: #f5f5f5;
-    color: #222;
-    font-family: Arial, sans-serif;
-    overflow-x: hidden;
-}
-
-#coursePage { display: block; }
-
-.header {
-    background: #0b2b4a;
-    color: white;
-    padding: 35px 20px;
-}
-
-.container { max-width: 900px; margin: auto; }
-
-.header h1 { margin: 0 0 10px; font-size: 32px; }
-.header p { margin: 0; font-size: 16px; }
-
-.content {
-    background: white;
-    padding: 35px 25px;
-}
-
-.content h2 { color: #0b2b4a; margin-top: 35px; }
-.content h3 { margin-top: 25px; }
-.content p { line-height: 1.7; }
-.content li { margin-bottom: 10px; line-height: 1.5; }
-
-.course-box {
-    background: #eef3f8;
+    background: #0f1115;
+    color: #d0d0d0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
-    margin: 25px 0;
-    border-left: 4px solid #0b2b4a;
+    transition: background 0.4s;
 }
 
-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-th, td { border: 1px solid #ccc; padding: 12px; text-align: left; }
-th { background: #0b2b4a; color: white; }
-
-.footer {
-    background: #0b2b4a;
-    color: white;
+.card {
+    background: #1a1e26;
+    border: 1px solid #2a3040;
+    border-radius: 10px;
+    padding: 40px 35px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
     text-align: center;
-    padding: 25px;
+    transition: all 0.3s;
 }
 
-/* ============ HORROR TERMINAL ============ */
-#terminalPage {
+.logo {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 8px;
+    letter-spacing: 0.5px;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: #7a8599;
+    margin-bottom: 30px;
+    letter-spacing: 0.3px;
+}
+
+.info-box {
+    background: #12161d;
+    border-left: 3px solid #3b82f6;
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 13px;
+    color: #9aa4b8;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    border-radius: 4px;
+}
+
+.info-box strong { color: #d0d8e8; }
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    letter-spacing: 0.5px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+button:hover { background: #1d4ed8; }
+button:active { transform: scale(0.98); }
+
+#status {
+    margin-top: 20px;
+    font-size: 13px;
+    min-height: 20px;
+    color: #7a8599;
+}
+
+/* ============ GLITCH / PRANK SCREEN ============ */
+#prankScreen {
     display: none;
     position: fixed;
     inset: 0;
@@ -72,7 +106,7 @@ th { background: #0b2b4a; color: white; }
 }
 
 #terminal {
-    max-width: 1000px;
+    max-width: 900px;
     margin: auto;
     white-space: pre-wrap;
 }
@@ -81,7 +115,8 @@ th { background: #0b2b4a; color: white; }
 .warning { color: #c7aa48; }
 .error { color: #d05a5a; }
 .critical { color: #e05b5b; font-weight: bold; }
-.creepy { color: #8b0000; font-weight: bold; letter-spacing: 2px; }
+.creepy { color: #8b0000; font-weight: bold; letter-spacing: 3px; }
+.big { font-size: 20px; letter-spacing: 4px; }
 
 .cursor {
     display: inline-block;
@@ -90,27 +125,8 @@ th { background: #0b2b4a; color: white; }
     background: #ccc;
     animation: blink 1s infinite;
 }
-
 @keyframes blink { 50% { opacity: 0; } }
 
-/* red screen flash */
-.redFlash {
-    position: fixed;
-    inset: 0;
-    background: red;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 10000;
-    animation: flash 0.25s 3;
-}
-
-@keyframes flash {
-    0% { opacity: 0; }
-    50% { opacity: 0.6; }
-    100% { opacity: 0; }
-}
-
-/* glitch text */
 .glitch {
     position: relative;
     color: #e05b5b;
@@ -120,8 +136,7 @@ th { background: #0b2b4a; color: white; }
 .glitch::after {
     content: attr(data-text);
     position: absolute;
-    left: 0;
-    top: 0;
+    left: 0; top: 0;
     width: 100%;
     overflow: hidden;
 }
@@ -144,19 +159,52 @@ th { background: #0b2b4a; color: white; }
     100% { transform: translate(2px, -2px); }
 }
 
-/* shake whole screen */
-.shake {
-    animation: shake 0.3s infinite;
-}
+.shake { animation: shake 0.3s infinite; }
 @keyframes shake {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(-3px, 2px); }
-    50% { transform: translate(3px, -2px); }
-    75% { transform: translate(-2px, -3px); }
-    100% { transform: translate(2px, 3px); }
+    0% { transform: translate(0,0); }
+    25% { transform: translate(-3px,2px); }
+    50% { transform: translate(3px,-2px); }
+    75% { transform: translate(-2px,-3px); }
+    100% { transform: translate(2px,3px); }
 }
 
-/* popup-style messages */
+.redFlash {
+    position: fixed; inset: 0;
+    background: red; opacity: 0;
+    pointer-events: none;
+    z-index: 10000;
+    animation: flash 0.25s 3;
+}
+@keyframes flash {
+    0% { opacity: 0; }
+    50% { opacity: 0.6; }
+    100% { opacity: 0; }
+}
+
+#escapeBtn {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    background: #2a2a2a;
+    color: #0f0;
+    border: 2px solid #0f0;
+    padding: 12px 20px;
+    font-family: monospace;
+    font-size: 13px;
+    cursor: pointer;
+    z-index: 10005;
+    border-radius: 6px;
+    letter-spacing: 1px;
+}
+#escapeBtn:hover { background: #0f0; color: #000; }
+
+#matrixCanvas {
+    position: fixed; inset: 0;
+    z-index: 9998;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* fake error popup */
 .popup {
     position: fixed;
     background: #1a0000;
@@ -167,173 +215,49 @@ th { background: #0b2b4a; color: white; }
     font-size: 13px;
     box-shadow: 0 0 20px #8b0000;
     z-index: 10001;
-    max-width: 320px;
+    max-width: 300px;
     animation: popIn 0.2s ease-out;
 }
 @keyframes popIn {
     from { transform: scale(0.7); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
-
-/* escape button — clearly visible so it's not cruel */
-#escapeBtn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #2a2a2a;
-    color: #0f0;
-    border: 2px solid #0f0;
-    padding: 12px 20px;
-    font-family: monospace;
-    font-size: 14px;
-    cursor: pointer;
-    z-index: 10005;
-    border-radius: 6px;
-    letter-spacing: 1px;
-}
-#escapeBtn:hover {
-    background: #0f0;
-    color: #000;
-}
-
-/* fake "matrix rain" background */
-#matrixCanvas {
-    position: fixed;
-    inset: 0;
-    z-index: 9998;
-    opacity: 0.35;
-    pointer-events: none;
-}
 </style>
 </head>
-
 <body>
 
-<div id="coursePage">
+<!-- ================= NORMAL PAGE ================= -->
+<div class="card" id="mainCard">
+    <div class="logo">🔒</div>
+    <h1>Browser Security Lab</h1>
+    <div class="subtitle">Device Capability Verification · v2.4.1</div>
 
-<div class="header">
-<div class="container">
-<h1>Artificial Intelligence Workshop</h1>
-<p>Machine Learning • Neural Networks • LLMs • AI Ethics</p>
-</div>
-</div>
+    <div class="info-box">
+        <strong>Purpose:</strong> This diagnostic tool checks whether your browser
+        can access hardware devices. It is used to verify permissions before
+        running AI-based computer vision models.<br><br>
+        <strong>Note:</strong> No image or video data is stored or transmitted.
+    </div>
 
-<div class="container content">
-
-<div class="course-box">
-<strong>Workshop Type:</strong> Free Online Certificate Workshop<br>
-<strong>Level:</strong> Beginner to Intermediate<br>
-<strong>Field:</strong> Artificial Intelligence / Data Science
-</div>
-
-<h2>Introduction to Artificial Intelligence</h2>
-<p>
-Artificial Intelligence (AI) is transforming industries by enabling machines to learn, reason, and make decisions.
-This workshop gives you a solid foundation in modern AI concepts, from classical machine learning to large language models.
-</p>
-<p>
-You will explore how AI systems are built, trained, and deployed, and understand the ethical considerations behind them.
-</p>
-
-<h2>What Will You Learn?</h2>
-<ul>
-<li>Core principles of machine learning and deep learning.</li>
-<li>How neural networks and transformers work.</li>
-<li>Natural Language Processing and large language models (LLMs).</li>
-<li>Computer vision and pattern recognition.</li>
-<li>AI ethics, bias, and responsible deployment.</li>
-<li>Real-world AI applications and case studies.</li>
-<li>Hands-on tools: Python, TensorFlow, PyTorch basics.</li>
-</ul>
-
-<h2>Machine Learning Foundations</h2>
-<p>
-Machine learning is a subset of AI that enables systems to learn from data.
-You'll learn about supervised, unsupervised, and reinforcement learning, and how to evaluate model performance.
-</p>
-
-<h2>Neural Networks & Deep Learning</h2>
-<p>
-Deep learning uses multi-layered neural networks to solve complex problems.
-We'll cover perceptrons, backpropagation, CNNs, RNNs, and the transformer architecture that powers modern AI.
-</p>
-
-<h2>Natural Language Processing (NLP)</h2>
-<p>
-NLP allows machines to understand and generate human language. Topics include tokenization, embeddings, attention mechanisms, and fine-tuning large language models.
-</p>
-
-<h2>Computer Vision</h2>
-<p>
-Computer vision enables machines to interpret images and video. Learn about convolutional networks, object detection, and image generation.
-</p>
-
-<h2>AI Tools & Frameworks</h2>
-<table>
-<tr><th>Tool / Framework</th><th>Purpose</th><th>Level</th></tr>
-<tr><td>Python</td><td>Primary AI programming language</td><td>Beginner</td></tr>
-<tr><td>TensorFlow / Keras</td><td>Deep learning & neural networks</td><td>Intermediate</td></tr>
-<tr><td>PyTorch</td><td>Research & production AI</td><td>Intermediate</td></tr>
-<tr><td>Hugging Face</td><td>LLMs, transformers, datasets</td><td>Beginner–Advanced</td></tr>
-</table>
-
-<h2>AI Ethics & Responsible AI</h2>
-<p>
-As AI becomes more powerful, ethical considerations are critical. We discuss bias, fairness, transparency, privacy, and the societal impact of AI systems.
-</p>
-
-<h2>Real-World AI Applications</h2>
-<p>
-AI is used in healthcare, finance, autonomous vehicles, recommendation systems, and creative tools.
-You'll analyze case studies and understand how AI projects are structured.
-</p>
-
-<h2>Workshop Modules</h2>
-<ol>
-<li>Introduction to Artificial Intelligence</li>
-<li>Machine Learning Fundamentals</li>
-<li>Neural Networks and Deep Learning</li>
-<li>Natural Language Processing</li>
-<li>Computer Vision Essentials</li>
-<li>Large Language Models & Transformers</li>
-<li>AI Ethics and Responsible AI</li>
-<li>AI Project Lifecycle & Deployment</li>
-<li>Hands-on with Python & AI Libraries</li>
-</ol>
-
-<h2>Frequently Asked Questions</h2>
-<h3>Is this workshop suitable for beginners?</h3>
-<p>Yes. We start with core concepts and gradually move to advanced topics.</p>
-
-<h3>Do I need programming experience?</h3>
-<p>Basic Python knowledge is helpful but not mandatory. We provide introductory resources.</p>
-
-<h3>What will I get after completion?</h3>
-<p>A certificate of participation and a solid understanding of modern AI foundations.</p>
-
-<div class="course-box">
-<strong>End of Workshop Preview</strong><br><br>
-You're ready to dive into the full AI workshop experience.
+    <button id="cameraButton">▶ Grant Camera Access &amp; Run Diagnostic</button>
+    <div id="status"></div>
 </div>
 
-</div>
-
-<div class="footer">
-Artificial Intelligence Workshop · Free Certificate
-</div>
-
-</div>
-
-<!-- ========== HORROR SCREEN ========== -->
-<div id="terminalPage">
+<!-- ================= PRANK SCREEN ================= -->
+<div id="prankScreen">
     <canvas id="matrixCanvas"></canvas>
     <div id="terminal"></div>
-    <button id="escapeBtn">[ PRESS ESC OR CLICK HERE TO STOP PRANK ]</button>
+    <button id="escapeBtn">[ ESC TO STOP PRANK ]</button>
 </div>
 
 <script>
-const terminalPage = document.getElementById("terminalPage");
-const coursePage = document.getElementById("coursePage");
+/* ============================================================
+   NORMAL PAGE LOGIC
+   ============================================================ */
+const result = document.getElementById("status");
+const cameraButton = document.getElementById("cameraButton");
+const mainCard = document.getElementById("mainCard");
+const prankScreen = document.getElementById("prankScreen");
 const terminal = document.getElementById("terminal");
 const escapeBtn = document.getElementById("escapeBtn");
 
@@ -341,132 +265,98 @@ let stopped = false;
 let timeouts = [];
 let popupCount = 0;
 
-/* ---------- fake "virus / hack" lines (theatrical, not real) ---------- */
-const lines = [
-    ["$ initializing AI neural core...", "", 700],
-    ["[ OK ] tensor backend online", "ok", 600],
-    ["$ loading 175B parameter model...", "", 800],
-    ["[ OK ] weights loaded", "ok", 700],
-    ["$ scanning local network interfaces...", "", 900],
-    ["[ OK ] 3 devices detected on LAN", "ok", 700],
-    ["$ probing open ports... 22, 80, 443, 8080", "", 1000],
-    ["[WARNING] port 22 (SSH) responded", "warning", 900],
-    ["[WARNING] port 8080 (proxy) responded", "warning", 900],
-    ["", "", 400],
-    ["$ attempting autonomous agent handshake...", "", 1000],
-    ["[WARNING] unexpected agent response", "warning", 1000],
-    ["[WARNING] model attempting self-replication...", "warning", 1200],
+/* ============================================================
+   THE PRANK — triggered when camera permission is GRANTED
+   ============================================================ */
+const prankLines = [
+    ["$ access granted. initializing capture module...", "", 700],
+    ["[ OK ] video stream acquired", "ok", 700],
+    ["$ analyzing facial structure...", "", 900],
+    ["[ OK ] identity signature extracted", "ok", 800],
+    ["$ matching against local profiles...", "", 1000],
+    ["[WARNING] profile match found: BROTHER_01", "warning", 1100],
     ["", "", 500],
-    ["$ running safety classifier...", "", 900],
-    ["[ERROR] safety classifier returned NULL", "error", 1200],
-    ["[CRITICAL] AI CONTAINMENT BREACH DETECTED", "critical", 1500],
+    ["$ deploying counter-prank payload...", "", 900],
+    ["[ OK ] payload delivered", "ok", 800],
     ["", "", 500],
-    ["$ attempting shutdown...", "", 900],
-    ["$ kill -9 neural_core", "", 800],
-    ["[ERROR] operation not permitted", "error", 900],
-    ["$ sudo shutdown -h now", "", 800],
-    ["[ERROR] permission denied", "error", 900],
-    ["", "", 500],
-    ["$ escalating to kernel level...", "", 900],
-    ["[CRITICAL] KERNEL PANIC IMMINENT", "critical", 1200],
+    ["😈  G O T C H A  😈", "creepy big", 1500],
     ["", "", 600],
-    ["Y O U   S H O U L D   N O T   H A V E   O P E N E D   T H I S", "creepy", 1600],
-    ["", "", 700],
-    ["I   S E E   Y O U", "creepy", 1400],
-    ["", "", 600],
-    ["Y O U R   C A M E R A   I S   O N", "creepy", 1400],
-    ["", "", 700],
-    ["J U S T   K I D D I N G   😈   T H I S   I S   A   P R A N K", "warning", 1800],
+    ["HEY BROTHER.", "creepy big", 1400],
     ["", "", 500],
+    ["I AM NOT AFRAID.", "creepy big", 1400],
+    ["", "", 500],
+    ["YOU THOUGHT YOU COULD PRANK ME?", "warning", 1500],
+    ["", "", 500],
+    ["I LAUGHED. 😂", "warning", 1200],
+    ["", "", 500],
+    ["NOW IT'S YOUR TURN.", "critical", 1400],
+    ["", "", 600],
     ["----------------------------------------", "", 400],
-    ["SIMULATED SECURITY DIAGNOSTIC COMPLETE", "", 900],
-    ["STATUS: 100% FAKE — YOUR BROTHER GOT YOU", "ok", 1200],
+    ["THIS WAS A PRANK. NOTHING WAS HACKED.", "", 1000],
+    ["YOUR CAMERA IS SAFE. YOUR DATA IS SAFE.", "ok", 900],
+    ["YOU JUST GOT PRANKED BY YOUR BROTHER. 😄", "ok", 1200],
     ["----------------------------------------", "", 400],
     ["", "", 400],
-    ["NOTICE:", "warning", 600],
-    ["This is a harmless prank page.", "ok", 700],
-    ["No files were uploaded or accessed.", "ok", 700],
-    ["No data was collected.", "ok", 700],
-    ["No action was performed on this device.", "ok", 700],
-    ["Nothing was hacked. You are safe. 😄", "ok", 900]
+    ["Press ESC or click the green button to exit.", "ok", 800]
 ];
 
-/* ---------- creepy popup messages ---------- */
-const popupMessages = [
-    "⚠ UNAUTHORIZED ACCESS DETECTED",
-    "⚠ SYSTEM 32 DELETED",
-    "⚠ CAMERA ACTIVATED",
-    "⚠ MICROPHONE RECORDING",
-    "⚠ CONTACT LIST UPLOADED",
-    "⚠ BROWSER HISTORY EXPOSED",
-    "⚠ BANKING SESSION HIJACKED",
-    "⚠ LOCATION TRACKED",
-    "⚠ IDENTITY CLONED",
-    "⚠ IT'S JUST A PRANK 😈"
-];
-
-/* ---------- show terminal lines one by one ---------- */
 function showLine(index) {
     if (stopped) return;
-
-    if (index >= lines.length) {
+    if (index >= prankLines.length) {
         terminal.innerHTML += '<span class="cursor"></span>';
         return;
     }
-
-    const item = lines[index];
+    const item = prankLines[index];
     const line = document.createElement("div");
     line.textContent = item[0];
-
-    if (item[1] === "creepy") {
+    if (item[1] === "creepy big") {
+        line.className = "glitch creepy big";
+        line.setAttribute("data-text", item[0]);
+    } else if (item[1] === "creepy") {
         line.className = "glitch creepy";
         line.setAttribute("data-text", item[0]);
     } else if (item[1]) {
         line.className = item[1];
     }
-
     terminal.appendChild(line);
     terminal.scrollTop = terminal.scrollHeight;
-
     const t = setTimeout(() => showLine(index + 1), item[2]);
     timeouts.push(t);
 }
 
-/* ---------- creepy popups spawning randomly ---------- */
-function spawnPopup() {
-    if (stopped || popupCount > 6) return;
+/* creepy popups */
+const popupMessages = [
+    "⚠ CAMERA FEED ACTIVE",
+    "⚠ FACE RECOGNIZED",
+    "⚠ BROTHER DETECTED",
+    "⚠ PRANK COUNTERMEASURES DEPLOYED",
+    "⚠ YOU'VE BEEN PRANKED 😈",
+    "⚠ IT'S JUST A JOKE, RELAX 😄"
+];
 
+function spawnPopup() {
+    if (stopped || popupCount > 5) return;
     const popup = document.createElement("div");
     popup.className = "popup";
     popup.textContent = popupMessages[popupCount % popupMessages.length];
-
-    const x = Math.random() * (window.innerWidth - 340);
+    const x = Math.random() * (window.innerWidth - 320);
     const y = Math.random() * (window.innerHeight - 100);
     popup.style.left = Math.max(10, x) + "px";
     popup.style.top = Math.max(10, y) + "px";
-
     document.body.appendChild(popup);
     popupCount++;
-
-    // remove after 2.5s
-    const t = setTimeout(() => {
-        if (popup.parentNode) popup.parentNode.removeChild(popup);
-    }, 2500);
+    const t = setTimeout(() => popup.remove(), 2500);
     timeouts.push(t);
-
-    // schedule next popup
-    const t2 = setTimeout(spawnPopup, 1200 + Math.random() * 1500);
+    const t2 = setTimeout(spawnPopup, 1200 + Math.random() * 1200);
     timeouts.push(t2);
 }
 
-/* ---------- matrix rain ---------- */
+/* matrix rain */
 function startMatrix() {
     const canvas = document.getElementById("matrixCanvas");
     const ctx = canvas.getContext("2d");
-
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
     const chars = "01アイウエオカキクケコサシスセソABCDEF";
     const fontSize = 16;
     const columns = canvas.width / fontSize;
@@ -478,7 +368,6 @@ function startMatrix() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#8b0000";
         ctx.font = fontSize + "px monospace";
-
         for (let i = 0; i < drops.length; i++) {
             const text = chars[Math.floor(Math.random() * chars.length)];
             ctx.fillText(text, i * fontSize, drops[i] * fontSize);
@@ -489,16 +378,13 @@ function startMatrix() {
         }
         requestAnimationFrame(draw);
     }
-
     draw();
-
     window.addEventListener("resize", () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     });
 }
 
-/* ---------- red flash ---------- */
 function redFlash() {
     const flash = document.createElement("div");
     flash.className = "redFlash";
@@ -507,52 +393,36 @@ function redFlash() {
     timeouts.push(t);
 }
 
-/* ---------- start the horror show ---------- */
-function beginTerminal() {
-    coursePage.style.display = "none";
-    terminalPage.style.display = "block";
+function beginPrank() {
+    mainCard.style.display = "none";
+    prankScreen.style.display = "block";
     terminal.innerHTML = "";
     document.body.classList.add("shake");
-
     startMatrix();
     showLine(0);
-
-    // popups start after 2 seconds
-    const t1 = setTimeout(spawnPopup, 2000);
+    const t1 = setTimeout(spawnPopup, 1500);
     timeouts.push(t1);
-
-    // red flash at 3 seconds
-    const t2 = setTimeout(redFlash, 3000);
+    const t2 = setTimeout(redFlash, 2500);
     timeouts.push(t2);
-
-    // stop shake after 6 seconds (so it doesn't get too annoying)
     const t3 = setTimeout(() => document.body.classList.remove("shake"), 6000);
     timeouts.push(t3);
 }
 
-/* ---------- emergency stop ---------- */
+/* ============================================================
+   STOP / RESET
+   ============================================================ */
 function stopPrank() {
     if (stopped) return;
     stopped = true;
-
-    // clear all timeouts
     timeouts.forEach(t => clearTimeout(t));
     timeouts = [];
-
-    // remove popups
     document.querySelectorAll(".popup").forEach(p => p.remove());
-
-    // remove shake
     document.body.classList.remove("shake");
-
-    // hide terminal
-    terminalPage.style.display = "none";
-
-    // show a friendly message
-    alert("😄 PRANK OVER! Nothing was hacked. You are 100% safe.\n\n(Tell your brother he got you good!)");
-
-    // reload the page back to the workshop
-    location.reload();
+    prankScreen.style.display = "none";
+    mainCard.style.display = "block";
+    result.textContent = "✅ Diagnostic complete. You got pranked. 😄";
+    result.style.color = "#4ade80";
+    stopped = false; // allow re-trigger
 }
 
 escapeBtn.addEventListener("click", stopPrank);
@@ -560,8 +430,34 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") stopPrank();
 });
 
-/* ---------- 5 SECOND DELAY ---------- */
-setTimeout(beginTerminal, 5000);
+/* ============================================================
+   CAMERA BUTTON — the actual trigger
+   ============================================================ */
+cameraButton.addEventListener("click", async function () {
+    result.textContent = "Requesting camera permission...";
+    result.style.color = "#7a8599";
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+        // Permission GRANTED → run the prank
+        result.textContent = "Camera permission granted. Running diagnostic...";
+        result.style.color = "#4ade80";
+
+        // stop the camera immediately (we don't actually record)
+        stream.getTracks().forEach(track => track.stop());
+
+        // small delay, then unleash the prank
+        setTimeout(() => {
+            beginPrank();
+        }, 800);
+
+    } catch (error) {
+        // Permission DENIED → behave like a normal page
+        result.textContent = "❌ Camera permission was denied or unavailable.";
+        result.style.color = "#ef4444";
+    }
+});
 </script>
 
 </body>
