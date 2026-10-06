@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Browser Lab</title>
+</head>
+
+<body>
+
+    <h1>Browser Information Lab</h1>
+
+    <p id="result"></p>
+
+    <button id="cameraButton">Test Camera Permission</button>
+
+    <script>
+
+       const result = document.getElementById("result");
+
+const cameraButton = document.getElementById("cameraButton");
+
+cameraButton.addEventListener("click", async function() {
+
+    try {
+
+        const stream =
+            await navigator.mediaDevices.getUserMedia({ video: true });
+
+        result.textContent = "Camera permission was granted";
+
+        stream.getTracks().forEach(function(track) {
+            track.stop();
+        });
+
+    } catch (error) {
+
+        result.textContent =
+            "Camera permission was denied or unavailable";
+
+    }
+
+});
+    </script>
+
+</body>
+
+</html>
